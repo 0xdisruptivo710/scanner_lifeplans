@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/select';
 import { usePanelMapping } from '@/hooks/use-panel-mapping';
 
+const ALLOWED_PANEL = 'Painel Comercial - Gestor CRM';
+
 export function ColumnSelect({
   value,
   onChange,
@@ -21,6 +23,7 @@ export function ColumnSelect({
   const grouped = useMemo(() => {
     const m = new Map<string, { panel: string; steps: { key: string; name: string }[] }>();
     for (const row of data?.rows ?? []) {
+      if (row.panel_name !== ALLOWED_PANEL) continue;
       if (!m.has(row.panel_name)) m.set(row.panel_name, { panel: row.panel_name, steps: [] });
       m.get(row.panel_name)!.steps.push({ key: row.composite_key, name: row.step_name });
     }

@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { ActionStatus, SuggestionRow } from '@/lib/types';
+import type { SuggestionRow } from '@/lib/types';
 
 const PERIODS: { label: string; days: number }[] = [
   { label: 'Últimas 24h', days: 1 },
@@ -22,7 +22,6 @@ const PERIODS: { label: string; days: number }[] = [
 
 function HistoricoPage() {
   const [days, setDays] = useState(7);
-  const [status, setStatus] = useState<ActionStatus | 'all'>('all');
   const [actionedBy, setActionedBy] = useState<string>('all');
   const [openRow, setOpenRow] = useState<SuggestionRow | null>(null);
 
@@ -31,16 +30,16 @@ function HistoricoPage() {
     [days],
   );
 
-  const history = useHistory({ sinceIso, status, actionedBy });
+  const history = useHistory({ sinceIso, status: 'executed', actionedBy });
   const rows = history.data ?? [];
 
   return (
     <div className="space-y-5">
       <div className="flex items-baseline justify-between">
         <div>
-          <h2 className="text-lg font-medium tracking-tight">Histórico</h2>
+          <h2 className="text-lg font-medium tracking-tight">Ações Aprovadas</h2>
           <p className="text-xs text-muted-foreground">
-            Ações aprovadas, rejeitadas, expiradas ou com falha.
+            Follow-ups aprovados e executados com sucesso.
           </p>
         </div>
         <span className="font-mono text-xs text-muted-foreground">{rows.length} registros</span>
@@ -58,21 +57,6 @@ function HistoricoPage() {
                   {p.label}
                 </SelectItem>
               ))}
-            </SelectContent>
-          </Select>
-        </FilterField>
-
-        <FilterField label="Status">
-          <Select value={status} onValueChange={(v) => setStatus(v as ActionStatus | 'all')}>
-            <SelectTrigger className="w-[160px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="executed">Executado</SelectItem>
-              <SelectItem value="rejected">Rejeitado</SelectItem>
-              <SelectItem value="failed">Falhou</SelectItem>
-              <SelectItem value="expired">Expirado</SelectItem>
             </SelectContent>
           </Select>
         </FilterField>

@@ -1,4 +1,4 @@
-import { Circle, History, Inbox, RefreshCw } from 'lucide-react';
+import { CheckCheck, Circle, Inbox, RefreshCw } from 'lucide-react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -46,7 +46,7 @@ export function AppHeader({
                 size="sm"
                 className={cn(isActive && 'bg-muted/60 text-foreground')}
               >
-                <Inbox className="h-3.5 w-3.5" /> Inbox
+                <Inbox className="h-3.5 w-3.5" /> Caixa de Sugestões
               </Button>
             )}
           </Link>
@@ -57,7 +57,7 @@ export function AppHeader({
                 size="sm"
                 className={cn(isActive && 'bg-muted/60 text-foreground')}
               >
-                <History className="h-3.5 w-3.5" /> Histórico
+                <CheckCheck className="h-3.5 w-3.5" /> Ações Aprovadas
               </Button>
             )}
           </Link>

@@ -65,7 +65,7 @@ export function buildColumns({
   cols.push(
     {
       id: 'type',
-      size: 80,
+      size: 110,
       header: 'Tipo',
       cell: ({ row }) => <TypeBadge suggestMessage={row.original.suggest_message} />,
     },

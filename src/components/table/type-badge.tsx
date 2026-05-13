@@ -12,7 +12,7 @@ export function TypeBadge({ suggestMessage }: { suggestMessage: boolean | null }
   }
   return (
     <Badge className="border-muted-foreground/30 bg-muted/40 text-muted-foreground">
-      <Tag className="h-3 w-3" /> Tag
+      <Tag className="h-3 w-3" /> Tag/Coluna
     </Badge>
   );
 }
