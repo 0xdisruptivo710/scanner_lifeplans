@@ -14,7 +14,8 @@ export type Mode =
   | 'skipped_cooldown'
   | 'error';
 
-export type CardAction = 'moved' | 'created' | 'skipped' | 'failed';
+// DB check constraint: ('move' | 'create' | 'none') OR null
+export type CardAction = 'move' | 'create' | 'none';
 
 export type WtsErrorEntry = { ok: boolean; status?: number; error?: string };
 

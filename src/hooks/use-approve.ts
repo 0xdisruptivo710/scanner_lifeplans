@@ -139,10 +139,10 @@ export async function approveOne({
         status: 0,
         error: `step_id_not_found_for:${row.column_applied ?? '(no column)'}`,
       };
-      updates.card_action = 'failed' satisfies CardAction;
+      updates.card_action = 'none' satisfies CardAction;
     } else if (!contactId) {
       errors.card = { ok: false, status: 0, error: 'no_contact_id' };
-      updates.card_action = 'failed' satisfies CardAction;
+      updates.card_action = 'none' satisfies CardAction;
     } else if (!targetPanelId) {
       // Sem panel_id não dá pra buscar card existente — direto cria
       const createRes = await wtsCreateCard({
@@ -154,10 +154,10 @@ export async function approveOne({
       errors.card = toEntry(createRes);
       if (createRes.ok) {
         updates.wts_card_moved_at = ts();
-        updates.card_action = 'created' satisfies CardAction;
+        updates.card_action = 'create' satisfies CardAction;
         updates.card_id_used = createRes.data.id;
       } else {
-        updates.card_action = 'failed' satisfies CardAction;
+        updates.card_action = 'none' satisfies CardAction;
       }
       await sleep(WTS_RATE_LIMIT_MS);
     } else {
@@ -165,17 +165,17 @@ export async function approveOne({
       await sleep(WTS_RATE_LIMIT_MS);
       if (!cardsRes.ok) {
         errors.card = toEntry(cardsRes);
-        updates.card_action = 'failed' satisfies CardAction;
+        updates.card_action = 'none' satisfies CardAction;
       } else if (cardsRes.data.length > 0) {
         const cardId = cardsRes.data[0]!.id;
         const moveRes = await wtsMoveCard(cardId, targetStepId);
         errors.card = toEntry(moveRes);
         if (moveRes.ok) {
           updates.wts_card_moved_at = ts();
-          updates.card_action = 'moved' satisfies CardAction;
+          updates.card_action = 'move' satisfies CardAction;
           updates.card_id_used = cardId;
         } else {
-          updates.card_action = 'failed' satisfies CardAction;
+          updates.card_action = 'none' satisfies CardAction;
         }
         await sleep(WTS_RATE_LIMIT_MS);
       } else {
@@ -188,10 +188,10 @@ export async function approveOne({
         errors.card = toEntry(createRes);
         if (createRes.ok) {
           updates.wts_card_moved_at = ts();
-          updates.card_action = 'created' satisfies CardAction;
+          updates.card_action = 'create' satisfies CardAction;
           updates.card_id_used = createRes.data.id;
         } else {
-          updates.card_action = 'failed' satisfies CardAction;
+          updates.card_action = 'none' satisfies CardAction;
         }
         await sleep(WTS_RATE_LIMIT_MS);
       }
