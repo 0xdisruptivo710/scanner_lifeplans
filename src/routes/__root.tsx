@@ -1,0 +1,39 @@
+import { Outlet, createRootRoute, useRouter } from '@tanstack/react-router';
+import { Toaster } from 'sonner';
+import { AppHeader } from '@/components/layout/app-header';
+import { useRealtime } from '@/hooks/use-realtime';
+import { useQueryClient, useIsFetching } from '@tanstack/react-query';
+
+function RootLayout() {
+  const realtime = useRealtime();
+  const router = useRouter();
+  const qc = useQueryClient();
+  const fetching = useIsFetching({ queryKey: ['suggestions'] }) > 0;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <AppHeader
+        realtimeStatus={realtime}
+        isFetching={fetching}
+        onRefresh={() => {
+          qc.invalidateQueries({ queryKey: ['suggestions'] });
+          qc.invalidateQueries({ queryKey: ['history'] });
+          router.invalidate();
+        }}
+      />
+      <main className="mx-auto max-w-7xl px-6 py-6">
+        <Outlet />
+      </main>
+      <Toaster
+        theme="dark"
+        richColors
+        position="bottom-right"
+        toastOptions={{ className: 'font-sans' }}
+      />
+    </div>
+  );
+}
+
+export const Route = createRootRoute({
+  component: RootLayout,
+});

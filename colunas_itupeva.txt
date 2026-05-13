@@ -1,0 +1,27 @@
+﻿Consultora Comercial - PipeLine > Agendar avaliação
+Consultora Comercial - PipeLine > Alto Potencial ⭐
+Consultora Comercial - PipeLine > Cliente Base – Orçamento Aberto
+Consultora Comercial - PipeLine > Cobrança Pagamento
+Consultora Comercial - PipeLine > Concluído
+Consultora Comercial - PipeLine > Em Análise / Pensando
+Consultora Comercial - PipeLine > Em andamento
+Consultora Comercial - PipeLine > Em Pausa (aguardando cliente)
+Consultora Comercial - PipeLine > Objeção Declarada
+Consultora Comercial - PipeLine > Orçamento enviado
+Consultora Comercial - PipeLine > Perdido / Não tem interesse
+Consultora Comercial - PipeLine > Reaplicação / Renovação sugerida
+Consultora Comercial - PipeLine > Retorno cliente****
+Consultora Comercial - PipeLine > Sem Resposta (Lead Frio)
+Minhas tarefas > Concluído
+Minhas tarefas > Em andamento
+Minhas tarefas > Pendente
+Painel Comercial - Gestor CRM > Agendou
+Painel Comercial - Gestor CRM > Desmarcou
+Painel Comercial - Gestor CRM > Em negociação
+Painel Comercial - Gestor CRM > Faltou
+Painel Comercial - Gestor CRM > Finalizados
+Painel Comercial - Gestor CRM > Orçamento em aberto
+Painel Comercial - Gestor CRM > Pós Procedimento/Recompra
+Painel Comercial - Gestor CRM > Recuperação Cliente
+Painel Comercial > Orçamento em aberto
+Painel Comercial > Reaplicação

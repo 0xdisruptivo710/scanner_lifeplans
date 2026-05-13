@@ -1,0 +1,14 @@
+node_modules
+dist
+.vercel
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+# Build cache
+*.tsbuildinfo
+
+# Local tooling
+.aiox-core/
+.claude/
