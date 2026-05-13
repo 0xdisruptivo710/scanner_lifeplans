@@ -1,4 +1,4 @@
-import { WHATSAPP_FROM, WTS_BASE, WTS_TOKEN } from './constants';
+import { WHATSAPP_FROM, WTS_BASE } from './constants';
 import { normalizePhoneBR } from './format';
 import type { WtsResult } from './types';
 
@@ -7,14 +7,10 @@ async function wtsFetch<T>(
   path: string,
   body?: unknown,
 ): Promise<WtsResult<T>> {
-  if (!WTS_TOKEN) {
-    return { ok: false, status: 0, error: 'wts_token_not_configured' };
-  }
   try {
     const res = await fetch(`${WTS_BASE}${path}`, {
       method,
       headers: {
-        Authorization: WTS_TOKEN,
         accept: 'application/json',
         ...(body ? { 'content-type': 'application/json' } : {}),
       },

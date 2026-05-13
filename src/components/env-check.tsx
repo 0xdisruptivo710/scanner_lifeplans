@@ -1,9 +1,8 @@
-import { SUPABASE_ANON_KEY, SUPABASE_URL, WTS_TOKEN } from '@/lib/constants';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/constants';
 
 const missing: { name: string; ok: boolean }[] = [
   { name: 'VITE_SUPABASE_URL', ok: !!SUPABASE_URL },
   { name: 'VITE_SUPABASE_ANON_KEY', ok: !!SUPABASE_ANON_KEY },
-  { name: 'VITE_WTS_TOKEN_ITUPEVA', ok: !!WTS_TOKEN },
 ];
 
 export function EnvCheckGate({ children }: { children: React.ReactNode }) {

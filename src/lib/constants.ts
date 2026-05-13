@@ -2,8 +2,10 @@ export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL?.trim() || 'https://ehlpmukjdknnyhkycncb.supabase.co';
 export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || '';
 
-export const WTS_BASE = 'https://api.wts.chat';
-export const WTS_TOKEN = import.meta.env.VITE_WTS_TOKEN_ITUPEVA ?? '';
+// Todas as chamadas WTS passam por /api/wts/* (Vercel Function proxy) para evitar CORS
+// e manter o token server-side. Em dev local sem `vercel dev`, esse path não responde.
+export const WTS_BASE = '/api/wts';
+export const WTS_TOKEN = ''; // token vive no servidor (env WTS_TOKEN_ITUPEVA)
 export const WHATSAPP_FROM = '5511913352918';
 export const CLIENT_HANDLE = 'itupeva';
 
