@@ -1,5 +1,6 @@
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://ehlpmukjdknnyhkycncb.supabase.co';
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
+export const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL?.trim() || 'https://ehlpmukjdknnyhkycncb.supabase.co';
+export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || '';
 
 export const WTS_BASE = 'https://api.wts.chat';
 export const WTS_TOKEN = import.meta.env.VITE_WTS_TOKEN_ITUPEVA ?? '';
