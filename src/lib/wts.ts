@@ -47,7 +47,7 @@ async function wtsFetch<T>(
 }
 
 export async function wtsApplyTag(phone: string, tag: string): Promise<WtsResult> {
-  const p = encodeURIComponent(phone);
+  const p = encodeURIComponent(normalizePhoneBR(phone));
   return wtsFetch('POST', `/core/v1/contact/phonenumber/${p}/tags`, {
     tagNames: [tag],
     operation: 'InsertIfNotExists',
@@ -57,8 +57,20 @@ export async function wtsApplyTag(phone: string, tag: string): Promise<WtsResult
 export async function wtsGetContact(
   phone: string,
 ): Promise<WtsResult<{ id: string; name?: string; phoneNumber?: string }>> {
-  const p = encodeURIComponent(phone);
+  const p = encodeURIComponent(normalizePhoneBR(phone));
   return wtsFetch('GET', `/core/v1/contact/phonenumber/${p}`);
+}
+
+export async function wtsGetContactById(
+  contactId: string,
+): Promise<WtsResult<{ id: string; name?: string; phoneNumber?: string }>> {
+  return wtsFetch('GET', `/core/v1/contact/${encodeURIComponent(contactId)}`);
+}
+
+export async function wtsGetSession(
+  sessionId: string,
+): Promise<WtsResult<{ id: string; contactId: string; title?: string | null }>> {
+  return wtsFetch('GET', `/chat/v2/session/${encodeURIComponent(sessionId)}`);
 }
 
 export async function wtsGetCards(
