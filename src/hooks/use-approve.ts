@@ -3,16 +3,16 @@ import { supabase } from '@/lib/supabase';
 import { WTS_RATE_LIMIT_MS, BULK_CONCURRENCY } from '@/lib/constants';
 import { sleep } from '@/lib/utils';
 import {
-  wtsApplyTag,
+  wtsApplyTagById,
   wtsCreateCard,
   wtsGetCards,
-  wtsGetContact,
   wtsGetContactById,
-  wtsGetSession,
+  wtsGetContactByPhone,
   wtsMoveCard,
   wtsSendMessage,
 } from '@/lib/wts';
 import { getOperatorOnce } from './use-operator';
+import { resolveTagId, type TagsCatalog } from './use-tags-catalog';
 import type {
   CardAction,
   PanelMappingRow,
@@ -25,6 +25,7 @@ type ApproveInput = {
   row: SuggestionRow;
   override?: string | null;
   mapping?: Map<string, PanelMappingRow>;
+  tagsCatalog?: TagsCatalog;
 };
 
 export type ApproveOutcome = {
@@ -38,43 +39,57 @@ function toEntry(r: WtsResult): WtsErrorEntry {
   return { ok: false, status: r.status, error: r.error };
 }
 
-async function resolveIdentity(
+async function ensurePhoneAndContactId(
   row: SuggestionRow,
   errors: Record<string, WtsErrorEntry>,
   updates: Record<string, unknown>,
-): Promise<{ phone: string | null; contactId: string | null; name: string | null }> {
+): Promise<{ phone: string | null; contactId: string | null }> {
   let phone = row.customer_phone;
-  let contactId: string | null = null;
-  let name = row.customer_name;
+  let contactId = row.contact_id;
 
-  if (!phone) {
-    // No phone — resolve via session
-    const sessionRes = await wtsGetSession(row.session_id);
-    errors.resolve_session = toEntry(sessionRes);
+  // Caso comum (novo schema): tudo já vem do N8N
+  if (phone && contactId) return { phone, contactId };
+
+  // Fallback A: temos phone, falta contactId
+  if (phone && !contactId) {
+    const res = await wtsGetContactByPhone(phone);
+    errors.resolve_contact = toEntry(res);
     await sleep(WTS_RATE_LIMIT_MS);
-    if (!sessionRes.ok) return { phone: null, contactId: null, name };
-
-    contactId = sessionRes.data.contactId;
-    const sessionTitle = sessionRes.data.title;
-    if (sessionTitle && !name) name = sessionTitle;
-
-    const contactRes = await wtsGetContactById(contactId);
-    errors.resolve_contact = toEntry(contactRes);
-    await sleep(WTS_RATE_LIMIT_MS);
-    if (!contactRes.ok) return { phone: null, contactId, name };
-
-    phone = contactRes.data.phoneNumber ?? null;
-    name = contactRes.data.name ?? name;
+    if (res.ok) {
+      contactId = res.data.id;
+      updates.contact_id = contactId;
+    }
+    return { phone, contactId };
   }
 
-  // Persist resolved values back to the row so future flows are fast
-  if (phone && phone !== row.customer_phone) updates.customer_phone = phone;
-  if (name && name !== row.customer_name) updates.customer_name = name;
+  // Fallback B: temos contactId, falta phone
+  if (!phone && contactId) {
+    const res = await wtsGetContactById(contactId);
+    errors.resolve_contact = toEntry(res);
+    await sleep(WTS_RATE_LIMIT_MS);
+    if (res.ok && res.data.phoneNumber) {
+      phone = res.data.phoneNumber;
+      updates.customer_phone = phone;
+      if (res.data.name && !row.customer_name) updates.customer_name = res.data.name;
+    }
+    return { phone, contactId };
+  }
 
-  return { phone, contactId, name };
+  // Caso de borda: sem phone nem contactId. Não tem o que fazer aqui — N8N precisa popular.
+  errors.resolve_contact = {
+    ok: false,
+    status: 0,
+    error: 'no_phone_no_contact_id_on_row',
+  };
+  return { phone: null, contactId: null };
 }
 
-export async function approveOne({ row, override, mapping }: ApproveInput): Promise<ApproveOutcome> {
+export async function approveOne({
+  row,
+  override,
+  mapping,
+  tagsCatalog,
+}: ApproveInput): Promise<ApproveOutcome> {
   const errors: Record<string, WtsErrorEntry> = {};
   const ts = () => new Date().toISOString();
   const updates: Record<string, unknown> = {
@@ -83,80 +98,107 @@ export async function approveOne({ row, override, mapping }: ApproveInput): Prom
     human_message_override: override ?? null,
   };
 
-  // 0) Resolve phone/contactId (uses session lookup if phone is missing)
-  const identity = await resolveIdentity(row, errors, updates);
-  const phone = identity.phone;
-  let contactId = identity.contactId;
+  const { phone, contactId } = await ensurePhoneAndContactId(row, errors, updates);
 
-  // 1) Apply tag
-  if (row.tag_applied) {
-    if (!phone) {
+  // 1) Aplicar tag (por UUID — tagIds)
+  if (row.tag_applied || row.suggested_tag_id) {
+    const tagId = resolveTagId(tagsCatalog, row.suggested_tag_id, row.tag_applied);
+    if (!tagId) {
+      errors.apply_tag = {
+        ok: false,
+        status: 0,
+        error: `tag_id_not_found_for:${row.tag_applied ?? '(no name)'}`,
+      };
+    } else if (!phone) {
       errors.apply_tag = { ok: false, status: 0, error: 'no_phone' };
     } else {
-      const res = await wtsApplyTag(phone, row.tag_applied);
+      const res = await wtsApplyTagById(phone, tagId);
       errors.apply_tag = toEntry(res);
       if (res.ok) updates.wts_tag_applied_at = ts();
       await sleep(WTS_RATE_LIMIT_MS);
     }
   }
 
-  // 2-4) Card
-  if (row.column_applied) {
-    const map = mapping?.get(row.column_applied);
-    if (!map) {
-      errors.card = { ok: false, status: 0, error: `composite_key_not_found:${row.column_applied}` };
-      updates.card_action = 'failed' satisfies CardAction;
-    } else if (!phone && !contactId) {
-      errors.card = { ok: false, status: 0, error: 'no_phone_no_contact' };
-      updates.card_action = 'failed' satisfies CardAction;
-    } else {
-      // If we didn't resolve contactId via session, resolve via phone lookup now
-      if (!contactId && phone) {
-        const byPhone = await wtsGetContact(phone);
-        await sleep(WTS_RATE_LIMIT_MS);
-        if (!byPhone.ok) {
-          errors.card = toEntry(byPhone);
-          updates.card_action = 'failed' satisfies CardAction;
-        } else {
-          contactId = byPhone.data.id;
-        }
-      }
+  // 2) Card: move se existe, cria se não existe
+  if (row.column_applied || row.suggested_step_id) {
+    // Step destino: prioriza suggested_step_id; senão resolve via mapping
+    let targetStepId: string | null = row.suggested_step_id;
+    let targetPanelId: string | null = null;
 
-      if (contactId && !errors.card) {
-        const cardsRes = await wtsGetCards(map.panel_id, contactId);
-        await sleep(WTS_RATE_LIMIT_MS);
-        if (!cardsRes.ok) {
-          errors.card = toEntry(cardsRes);
-          updates.card_action = 'failed' satisfies CardAction;
-        } else if (cardsRes.data.length > 0) {
-          const cardId = cardsRes.data[0]!.id;
-          const moveRes = await wtsMoveCard(cardId, map.step_id);
-          errors.card = toEntry(moveRes);
-          if (moveRes.ok) {
-            updates.wts_card_moved_at = ts();
-            updates.card_action = 'moved' satisfies CardAction;
-            updates.card_id_used = cardId;
-          } else {
-            updates.card_action = 'failed' satisfies CardAction;
-          }
-          await sleep(WTS_RATE_LIMIT_MS);
+    if (row.column_applied) {
+      const map = mapping?.get(row.column_applied);
+      if (map) {
+        targetPanelId = map.panel_id;
+        if (!targetStepId) targetStepId = map.step_id;
+      }
+    }
+
+    if (!targetStepId) {
+      errors.card = {
+        ok: false,
+        status: 0,
+        error: `step_id_not_found_for:${row.column_applied ?? '(no column)'}`,
+      };
+      updates.card_action = 'failed' satisfies CardAction;
+    } else if (!contactId) {
+      errors.card = { ok: false, status: 0, error: 'no_contact_id' };
+      updates.card_action = 'failed' satisfies CardAction;
+    } else if (!targetPanelId) {
+      // Sem panel_id não dá pra buscar card existente — direto cria
+      const createRes = await wtsCreateCard({
+        stepId: targetStepId,
+        title: row.customer_name ?? 'Cliente',
+        contactId,
+        sessionId: row.session_id,
+      });
+      errors.card = toEntry(createRes);
+      if (createRes.ok) {
+        updates.wts_card_moved_at = ts();
+        updates.card_action = 'created' satisfies CardAction;
+        updates.card_id_used = createRes.data.id;
+      } else {
+        updates.card_action = 'failed' satisfies CardAction;
+      }
+      await sleep(WTS_RATE_LIMIT_MS);
+    } else {
+      const cardsRes = await wtsGetCards(targetPanelId, contactId);
+      await sleep(WTS_RATE_LIMIT_MS);
+      if (!cardsRes.ok) {
+        errors.card = toEntry(cardsRes);
+        updates.card_action = 'failed' satisfies CardAction;
+      } else if (cardsRes.data.length > 0) {
+        const cardId = cardsRes.data[0]!.id;
+        const moveRes = await wtsMoveCard(cardId, targetStepId);
+        errors.card = toEntry(moveRes);
+        if (moveRes.ok) {
+          updates.wts_card_moved_at = ts();
+          updates.card_action = 'moved' satisfies CardAction;
+          updates.card_id_used = cardId;
         } else {
-          const createRes = await wtsCreateCard(map.panel_id, map.step_id, contactId);
-          errors.card = toEntry(createRes);
-          if (createRes.ok) {
-            updates.wts_card_moved_at = ts();
-            updates.card_action = 'created' satisfies CardAction;
-            updates.card_id_used = createRes.data.id;
-          } else {
-            updates.card_action = 'failed' satisfies CardAction;
-          }
-          await sleep(WTS_RATE_LIMIT_MS);
+          updates.card_action = 'failed' satisfies CardAction;
         }
+        await sleep(WTS_RATE_LIMIT_MS);
+      } else {
+        const createRes = await wtsCreateCard({
+          stepId: targetStepId,
+          title: row.customer_name ?? 'Cliente',
+          contactId,
+          sessionId: row.session_id,
+        });
+        errors.card = toEntry(createRes);
+        if (createRes.ok) {
+          updates.wts_card_moved_at = ts();
+          updates.card_action = 'created' satisfies CardAction;
+          updates.card_id_used = createRes.data.id;
+        } else {
+          updates.card_action = 'failed' satisfies CardAction;
+        }
+        await sleep(WTS_RATE_LIMIT_MS);
       }
     }
   }
 
-  // 5) Send message
+  // 3) Enviar mensagem
   if (row.suggest_message) {
     const text = (override ?? row.message_sent ?? '').trim();
     if (!text) {
@@ -210,15 +252,16 @@ export function useBulkApprove() {
     mutationFn: async (args: {
       rows: SuggestionRow[];
       mapping?: Map<string, PanelMappingRow>;
+      tagsCatalog?: TagsCatalog;
       onProgress?: (done: number, total: number) => void;
     }) => {
-      const { rows, mapping, onProgress } = args;
+      const { rows, mapping, tagsCatalog, onProgress } = args;
       const outcomes: ApproveOutcome[] = [];
       let done = 0;
       for (let i = 0; i < rows.length; i += BULK_CONCURRENCY) {
         const chunk = rows.slice(i, i + BULK_CONCURRENCY);
         const results = await Promise.allSettled(
-          chunk.map((row) => approveOne({ row, mapping })),
+          chunk.map((row) => approveOne({ row, mapping, tagsCatalog })),
         );
         for (const r of results) {
           if (r.status === 'fulfilled') outcomes.push(r.value);

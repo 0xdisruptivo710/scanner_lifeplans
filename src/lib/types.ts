@@ -24,6 +24,7 @@ export type SuggestionRow = {
   session_id: string;
   customer_phone: string | null;
   customer_name: string | null;
+  contact_id: string | null;
 
   classified_at: string;
   mode: Mode;
@@ -34,6 +35,12 @@ export type SuggestionRow = {
   tag_applied: string | null;
   column_applied: string | null;
   message_sent: string | null;
+
+  suggested_tag_id: string | null;
+  suggested_step_id: string | null;
+  current_tag_ids: string[] | null;
+  current_tag_names: string[] | null;
+  no_history: boolean | null;
 
   reasoning_short: string | null;
   scenario: string | null;

@@ -11,11 +11,13 @@ import { usePanelMapping } from '@/hooks/use-panel-mapping';
 import { useBulkApprove } from '@/hooks/use-approve';
 import { useReject } from '@/hooks/use-reject';
 import { useApprove } from '@/hooks/use-approve';
+import { useTagsCatalog } from '@/hooks/use-tags-catalog';
 import type { SuggestionRow } from '@/lib/types';
 
 function InboxPage() {
   const suggestions = useSuggestions();
   const { data: mapping } = usePanelMapping();
+  const { data: tagsCatalog } = useTagsCatalog();
   const bulkApprove = useBulkApprove();
   const reject = useReject();
   const approve = useApprove();
@@ -63,6 +65,7 @@ function InboxPage() {
       const out = await bulkApprove.mutateAsync({
         rows: selectedRows,
         mapping: mapping?.byKey,
+        tagsCatalog,
         onProgress: (done, total) => setProgress({ done, total }),
       });
       const ok = out.filter((o) => o.status === 'executed').length;
@@ -83,7 +86,7 @@ function InboxPage() {
   };
 
   const handleQuickApprove = async (row: SuggestionRow) => {
-    const out = await approve.mutateAsync({ row, mapping: mapping?.byKey });
+    const out = await approve.mutateAsync({ row, mapping: mapping?.byKey, tagsCatalog });
     if (out.status === 'executed') toast.success('Aprovado');
     else toast.error('Falha ao aprovar');
   };

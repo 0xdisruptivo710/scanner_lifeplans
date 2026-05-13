@@ -21,6 +21,7 @@ import { DrawerActions } from './drawer-actions';
 import { useApprove } from '@/hooks/use-approve';
 import { useReject } from '@/hooks/use-reject';
 import { usePanelMapping } from '@/hooks/use-panel-mapping';
+import { useTagsCatalog } from '@/hooks/use-tags-catalog';
 import { anonymizePhone, formatDateTime, formatRelativeTime } from '@/lib/format';
 import { validateMessage } from '@/lib/validation';
 import type { SuggestionRow, WtsErrorEntry } from '@/lib/types';
@@ -36,6 +37,7 @@ export function SuggestionDrawer({ row, open, onOpenChange, readOnly }: Props) {
   const approve = useApprove();
   const reject = useReject();
   const { data: mapping } = usePanelMapping();
+  const { data: tagsCatalog } = useTagsCatalog();
 
   const [tag, setTag] = useState<string | null>(null);
   const [column, setColumn] = useState<string | null>(null);
@@ -69,6 +71,7 @@ export function SuggestionDrawer({ row, open, onOpenChange, readOnly }: Props) {
       row: effective,
       override: overrideMessage ? validation.cleaned : null,
       mapping: mapping?.byKey,
+      tagsCatalog,
     });
     if (out.status === 'executed') {
       toast.success('Aprovado', {
