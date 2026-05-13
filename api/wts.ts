@@ -1,8 +1,4 @@
-export const config = {
-  // Default Vercel Functions (Fluid Compute, Node 24)
-};
-
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
   const token = process.env.WTS_TOKEN_ITUPEVA || process.env.VITE_WTS_TOKEN_ITUPEVA;
   if (!token) {
     return Response.json(
@@ -12,8 +8,18 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const url = new URL(req.url);
-  const targetPath = url.pathname.replace(/^\/api\/wts/, '') || '/';
-  const target = `https://api.wts.chat${targetPath}${url.search}`;
+  const wtsPath = url.searchParams.get('p');
+  if (!wtsPath) {
+    return Response.json(
+      { error: 'missing_path_query', hint: 'use /api/wts?p=/chat/v2/session/xxx' },
+      { status: 400 },
+    );
+  }
+
+  const forwardParams = new URLSearchParams(url.searchParams);
+  forwardParams.delete('p');
+  const forwardQs = forwardParams.toString();
+  const target = `https://api.wts.chat${wtsPath}${forwardQs ? `?${forwardQs}` : ''}`;
 
   const headers: Record<string, string> = {
     Authorization: token,
@@ -45,3 +51,9 @@ export default async function handler(req: Request): Promise<Response> {
     },
   });
 }
+
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const DELETE = handler;
+export const PATCH = handler;

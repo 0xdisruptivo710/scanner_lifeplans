@@ -7,8 +7,18 @@ async function wtsFetch<T>(
   path: string,
   body?: unknown,
 ): Promise<WtsResult<T>> {
+  // Build proxy URL: /api/wts?p=<wts-pathname>&<wts-query>
+  const [wtsPathname, wtsQuery] = path.split('?', 2);
+  const params = new URLSearchParams();
+  params.set('p', wtsPathname ?? '');
+  if (wtsQuery) {
+    const wtsParams = new URLSearchParams(wtsQuery);
+    wtsParams.forEach((v, k) => params.append(k, v));
+  }
+  const proxyUrl = `${WTS_BASE}?${params.toString()}`;
+
   try {
-    const res = await fetch(`${WTS_BASE}${path}`, {
+    const res = await fetch(proxyUrl, {
       method,
       headers: {
         accept: 'application/json',
