@@ -5,15 +5,17 @@ import { useRealtime } from '@/hooks/use-realtime';
 import { useQueryClient, useIsFetching } from '@tanstack/react-query';
 
 function RootLayout() {
-  const realtime = useRealtime();
+  useRealtime(); // keep the realtime subscription warm even with no UI indicator
   const router = useRouter();
   const qc = useQueryClient();
-  const fetching = useIsFetching({ queryKey: ['suggestions'] }) > 0;
+  const fetching =
+    useIsFetching({ queryKey: ['suggestions'] }) +
+      useIsFetching({ queryKey: ['history'] }) >
+    0;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader
-        realtimeStatus={realtime}
         isFetching={fetching}
         onRefresh={() => {
           qc.invalidateQueries({ queryKey: ['suggestions'] });

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { createRoute } from '@tanstack/react-router';
+import { Clock3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Route as rootRoute } from './__root';
 import { FilterTabs, type FilterKey } from '@/components/layout/filter-tabs';
@@ -100,13 +101,16 @@ function InboxPage() {
     <div className="space-y-6">
       {/* Page header — AIOS hierarchy: 22px/500 title, 14px secondary description */}
       <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="text-[22px] font-medium leading-tight tracking-[-0.015em] text-foreground">
-            Caixa de Sugestões
-          </h1>
-          <p className="text-[14px] text-muted-foreground">
-            Revisar, editar e aprovar follow-ups gerados pela IA.
-          </p>
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <h1 className="text-[22px] font-medium leading-tight tracking-[-0.015em] text-foreground">
+              Caixa de Sugestões
+            </h1>
+            <p className="text-[14px] text-muted-foreground">
+              Revisar, editar e aprovar follow-ups gerados pela IA.
+            </p>
+          </div>
+          <ScheduleNotice />
         </div>
         <div className="flex items-baseline gap-1.5 text-[12.5px] text-muted-foreground">
           <span className="font-mono text-foreground">{filtered.length}</span>
@@ -153,6 +157,22 @@ function InboxPage() {
         onOpenChange={(o) => !o && setOpenRow(null)}
       />
     </div>
+  );
+}
+
+function ScheduleNotice() {
+  return (
+    <p className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-full bg-primary-soft/70 py-1 pl-2 pr-3 text-[12px] text-primary-soft-foreground">
+      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface text-primary">
+        <Clock3 className="h-3 w-3" />
+      </span>
+      Sugestões atualizadas todos os dias às{' '}
+      <span className="font-mono font-medium">09h</span>
+      <span aria-hidden className="text-primary/40">
+        ·
+      </span>
+      tempo médio de <span className="font-mono font-medium">30 min</span> para execução.
+    </p>
   );
 }
 
