@@ -1,14 +1,34 @@
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+/*
+ * Confidence is a frequent eye-target — render as a tabular-numerals figure
+ * rather than a pill so it reads as data, not as a status.
+ */
 export function ConfidenceBadge({ value }: { value: number | null }) {
-  if (value == null) return <span className="text-muted-foreground">—</span>;
+  if (value == null) return <span className="text-subtle-foreground">—</span>;
   const rounded = Math.round(value * 100) / 100;
-  const cls =
+  const tone =
     value >= 0.85
-      ? 'border-primary/30 bg-primary/10 text-primary'
+      ? 'text-primary'
       : value >= 0.7
-        ? 'border-border bg-muted/40 text-muted-foreground'
-        : 'border-destructive/30 bg-destructive/10 text-destructive';
-  return <Badge className={cn('font-mono', cls)}>{rounded.toFixed(2)}</Badge>;
+        ? 'text-foreground'
+        : 'text-destructive';
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        aria-hidden
+        className={cn(
+          'h-1.5 w-1.5 rounded-full',
+          value >= 0.85
+            ? 'bg-primary'
+            : value >= 0.7
+              ? 'bg-muted-foreground/40'
+              : 'bg-destructive',
+        )}
+      />
+      <span className={cn('font-mono text-[12px] tabular-nums', tone)}>
+        {rounded.toFixed(2)}
+      </span>
+    </span>
+  );
 }

@@ -31,10 +31,14 @@ export function DrawerActions({
         Cancelar
       </Button>
       <Button variant="outline" onClick={onReject} disabled={busy}>
-        <X className="h-4 w-4" /> Rejeitar
+        <X className="h-3.5 w-3.5" /> Rejeitar
       </Button>
       <Button onClick={onApprove} disabled={busy || approveDisabled}>
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+        {busy ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Check className="h-3.5 w-3.5" />
+        )}
         {busy ? 'Aprovando…' : approveLabel}
       </Button>
     </>

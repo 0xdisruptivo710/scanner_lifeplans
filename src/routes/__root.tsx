@@ -11,7 +11,7 @@ function RootLayout() {
   const fetching = useIsFetching({ queryKey: ['suggestions'] }) > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <AppHeader
         realtimeStatus={realtime}
         isFetching={fetching}
@@ -21,14 +21,17 @@ function RootLayout() {
           router.invalidate();
         }}
       />
-      <main className="mx-auto max-w-7xl px-6 py-6">
+      <main className="mx-auto max-w-7xl px-6 pb-16 pt-8">
         <Outlet />
       </main>
       <Toaster
-        theme="dark"
+        theme="light"
         richColors
         position="bottom-right"
-        toastOptions={{ className: 'font-sans' }}
+        toastOptions={{
+          className: 'font-sans',
+          style: { borderRadius: '12px' },
+        }}
       />
     </div>
   );

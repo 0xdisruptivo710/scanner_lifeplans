@@ -6,7 +6,8 @@ import { TypeBadge } from './type-badge';
 import { ScenarioBadge } from './scenario-badge';
 import { ConfidenceBadge } from './confidence-badge';
 import { anonymizePhone, formatRelativeTime, truncate } from '@/lib/format';
-import type { SuggestionRow } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import type { ActionStatus, SuggestionRow } from '@/lib/types';
 
 type Args = {
   selected: Set<number>;
@@ -15,6 +16,15 @@ type Args = {
   onQuickApprove: (row: SuggestionRow) => void;
   onQuickReject: (row: SuggestionRow) => void;
   readOnly?: boolean;
+};
+
+const STATUS_STYLES: Record<ActionStatus, { bg: string; label: string }> = {
+  executed:  { bg: 'bg-success-soft text-success/90',         label: 'Executado' },
+  approved:  { bg: 'bg-primary-soft text-primary-soft-foreground', label: 'Aprovado' },
+  rejected:  { bg: 'bg-muted text-muted-foreground',          label: 'Rejeitado' },
+  failed:    { bg: 'bg-destructive-soft text-destructive/90', label: 'Falhou'    },
+  expired:   { bg: 'bg-warning-soft text-[#92400E]',          label: 'Expirado'  },
+  pending:   { bg: 'bg-muted text-muted-foreground',          label: 'Pendente'  },
 };
 
 export function buildColumns({
@@ -30,9 +40,9 @@ export function buildColumns({
   if (!readOnly) {
     cols.push({
       id: 'select',
-      size: 36,
+      size: 40,
       header: () => (
-        <span data-no-row-click>
+        <span data-no-row-click className="flex items-center">
           <Checkbox
             checked={allRows.length > 0 && allRows.every((r) => selected.has(r.id))}
             onCheckedChange={(v) => {
@@ -46,7 +56,7 @@ export function buildColumns({
         </span>
       ),
       cell: ({ row }) => (
-        <span data-no-row-click>
+        <span data-no-row-click className="flex items-center">
           <Checkbox
             checked={selected.has(row.original.id)}
             onCheckedChange={(v) => {
@@ -65,58 +75,55 @@ export function buildColumns({
   cols.push(
     {
       id: 'type',
-      size: 110,
+      size: 120,
       header: 'Tipo',
       cell: ({ row }) => <TypeBadge suggestMessage={row.original.suggest_message} />,
     },
     {
       id: 'scenario',
-      size: 200,
+      size: 210,
       header: 'Cenário',
       cell: ({ row }) => <ScenarioBadge scenario={row.original.scenario} />,
     },
     {
       id: 'customer',
-      size: 180,
+      size: 200,
       header: 'Cliente',
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.customer_name ?? '—'}</span>
-      ),
-    },
-    {
-      id: 'phone',
-      size: 170,
-      header: 'Telefone',
-      cell: ({ row }) => (
-        <span className="font-mono text-xs text-muted-foreground">
-          {anonymizePhone(row.original.customer_phone)}
-        </span>
+        <div className="flex flex-col gap-0.5 leading-tight">
+          <span className="text-[13px] font-medium text-foreground">
+            {row.original.customer_name ?? '—'}
+          </span>
+          <span className="font-mono text-[11px] text-subtle-foreground">
+            {anonymizePhone(row.original.customer_phone)}
+          </span>
+        </div>
       ),
     },
     {
       id: 'preview',
-      size: 320,
+      size: 340,
       header: 'Resumo IA',
       cell: ({ row }) => (
-        <span className="text-xs text-muted-foreground">
-          {truncate(row.original.message_sent ?? row.original.reasoning_short, 80)}
+        <span className="text-[12.5px] text-muted-foreground">
+          {truncate(row.original.message_sent ?? row.original.reasoning_short, 90)}
         </span>
       ),
     },
     {
       id: 'confidence',
-      size: 80,
-      header: 'Conf',
+      size: 90,
+      header: 'Conf.',
       accessorFn: (r) => r.confidence ?? 0,
       cell: ({ row }) => <ConfidenceBadge value={row.original.confidence} />,
     },
     {
       id: 'classified_at',
-      size: 100,
+      size: 90,
       header: 'Há',
       accessorFn: (r) => r.classified_at,
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-muted-foreground">
+        <span className="font-mono text-[11.5px] text-subtle-foreground">
           {formatRelativeTime(row.original.classified_at)}
         </span>
       ),
@@ -133,7 +140,7 @@ export function buildColumns({
           <Button
             size="icon"
             variant="ghost"
-            className="h-7 w-7 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+            className="h-8 w-8 rounded-md text-muted-foreground hover:bg-success-soft hover:text-success"
             onClick={() => onQuickApprove(row.original)}
             aria-label="Aprovar"
           >
@@ -142,7 +149,7 @@ export function buildColumns({
           <Button
             size="icon"
             variant="ghost"
-            className="h-7 w-7 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+            className="h-8 w-8 rounded-md text-muted-foreground hover:bg-destructive-soft hover:text-destructive"
             onClick={() => onQuickReject(row.original)}
             aria-label="Rejeitar"
           >
@@ -154,21 +161,19 @@ export function buildColumns({
   } else {
     cols.push({
       id: 'action_status',
-      size: 110,
+      size: 130,
       header: 'Status',
       cell: ({ row }) => {
         const s = row.original.action_status;
-        const cls =
-          s === 'executed'
-            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
-            : s === 'rejected'
-              ? 'border-zinc-500/30 bg-zinc-500/10 text-zinc-300'
-              : s === 'failed'
-                ? 'border-rose-500/30 bg-rose-500/10 text-rose-300'
-                : 'border-amber-500/30 bg-amber-500/10 text-amber-200';
+        const style = (s && STATUS_STYLES[s]) ?? null;
         return (
-          <span className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-medium ${cls}`}>
-            {s ?? '—'}
+          <span
+            className={cn(
+              'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium leading-5',
+              style?.bg ?? 'bg-muted text-muted-foreground',
+            )}
+          >
+            {style?.label ?? '—'}
           </span>
         );
       },

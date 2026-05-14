@@ -8,13 +8,13 @@ export function EmptyState({
   description?: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-center">
-      <div className="rounded-full border border-border bg-muted/30 p-3">
-        <Inbox className="h-6 w-6 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center gap-4 px-6 py-24 text-center">
+      <div className="grid h-12 w-12 place-items-center rounded-full bg-primary-soft text-primary">
+        <Inbox className="h-5 w-5" />
       </div>
       <div className="space-y-1">
-        <h3 className="text-sm font-medium">{title}</h3>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <h3 className="text-[15px] font-medium text-foreground">{title}</h3>
+        <p className="text-[13px] text-muted-foreground">{description}</p>
       </div>
     </div>
   );

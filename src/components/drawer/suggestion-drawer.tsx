@@ -9,7 +9,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
 import { ScenarioBadge } from '@/components/table/scenario-badge';
 import { ConfidenceBadge } from '@/components/table/confidence-badge';
 import { TypeBadge } from '@/components/table/type-badge';
@@ -24,6 +23,7 @@ import { usePanelMapping } from '@/hooks/use-panel-mapping';
 import { useTagsCatalog } from '@/hooks/use-tags-catalog';
 import { anonymizePhone, formatDateTime, formatRelativeTime } from '@/lib/format';
 import { validateMessage } from '@/lib/validation';
+import { cn } from '@/lib/utils';
 import type { SuggestionRow, WtsErrorEntry } from '@/lib/types';
 
 type Props = {
@@ -99,42 +99,45 @@ export function SuggestionDrawer({ row, open, onOpenChange, readOnly }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+      <SheetContent className="bg-background">
+        <SheetHeader className="bg-surface">
+          <div className="flex items-center gap-2">
             <TypeBadge suggestMessage={row.suggest_message} />
             <ScenarioBadge scenario={row.scenario} />
-            <ConfidenceBadge value={row.confidence} />
-          </SheetTitle>
-          <SheetDescription>
-            <span className="font-mono">{row.session_id.slice(0, 8)}…</span> · classificado{' '}
-            {formatRelativeTime(row.classified_at)} atrás
+            <span className="ml-auto">
+              <ConfidenceBadge value={row.confidence} />
+            </span>
+          </div>
+          <SheetTitle>{row.customer_name ?? 'Cliente sem nome'}</SheetTitle>
+          <SheetDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="font-mono text-subtle-foreground">
+              {anonymizePhone(row.customer_phone)}
+            </span>
+            <span className="text-subtle-foreground/60">·</span>
+            <span>{formatRelativeTime(row.classified_at)} atrás</span>
+            <span className="text-subtle-foreground/60">·</span>
+            <span className="font-mono text-subtle-foreground">
+              {row.session_id.slice(0, 8)}…
+            </span>
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
-          <Field label="Cliente">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-sm">{row.customer_name ?? '—'}</span>
-              <span className="font-mono text-xs text-muted-foreground">
-                {anonymizePhone(row.customer_phone)}
-              </span>
-            </div>
-            <p className="font-mono text-[10px] text-muted-foreground">
-              {formatDateTime(row.classified_at)}
-            </p>
-          </Field>
-
+        <div className="flex-1 space-y-5 overflow-y-auto bg-background px-6 py-6">
           {row.reasoning_short && (
-            <Field label="Razão da IA">
-              <p className="text-sm leading-relaxed text-foreground/90">{row.reasoning_short}</p>
-            </Field>
+            <Card>
+              <SectionLabel>Razão da IA</SectionLabel>
+              <p className="text-[14px] leading-relaxed text-foreground">
+                {row.reasoning_short}
+              </p>
+              <p className="mt-3 font-mono text-[11px] text-subtle-foreground">
+                Classificado em {formatDateTime(row.classified_at)}
+              </p>
+            </Card>
           )}
 
-          <Separator />
-
-          <Field label="Ação sugerida">
-            <div className="grid grid-cols-1 gap-3">
+          <Card>
+            <SectionLabel>Ação sugerida</SectionLabel>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Labeled label="Tag" override={overrideTag}>
                 <TagSelect value={tag} onChange={setTag} disabled={readOnly} />
               </Labeled>
@@ -142,42 +145,58 @@ export function SuggestionDrawer({ row, open, onOpenChange, readOnly }: Props) {
                 <ColumnSelect value={column} onChange={setColumn} disabled={readOnly} />
               </Labeled>
             </div>
-          </Field>
+          </Card>
 
           {row.suggest_message ? (
             <>
-              <Separator />
-              <Field
-                label="Mensagem"
-                hint={overrideMessage ? 'editada por humano' : 'sugerida pela IA'}
-              >
+              <Card>
+                <div className="mb-3 flex items-baseline justify-between gap-2">
+                  <SectionLabel className="mb-0">Mensagem</SectionLabel>
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-medium',
+                      overrideMessage
+                        ? 'bg-primary-soft text-primary-soft-foreground'
+                        : 'bg-muted text-muted-foreground',
+                    )}
+                  >
+                    {overrideMessage ? 'editada por humano' : 'sugerida pela IA'}
+                  </span>
+                </div>
                 <MessageEditor value={message} onChange={setMessage} disabled={readOnly} />
-              </Field>
-              <Field label="Preview no WhatsApp">
+              </Card>
+
+              <Card>
+                <SectionLabel>Preview no WhatsApp</SectionLabel>
                 <WhatsappPreview text={validation.cleaned} />
-              </Field>
+              </Card>
             </>
           ) : (
-            <div className="rounded-md border border-border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-              IA não sugere envio de mensagem. Aprovação aplica apenas tag e move/cria o card.
-            </div>
+            <Card>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                IA não sugere envio de mensagem. Aprovação aplica apenas{' '}
+                <span className="font-medium text-foreground">tag</span> e move/cria o{' '}
+                <span className="font-medium text-foreground">card</span>.
+              </p>
+            </Card>
           )}
 
           {row.wts_errors && readOnly && (
-            <Field label="Erros WTS">
-              <pre className="overflow-auto rounded-md border border-border bg-muted/20 p-3 font-mono text-[10px] text-rose-200">
+            <Card>
+              <SectionLabel>Erros WTS</SectionLabel>
+              <pre className="overflow-auto rounded-md border border-border bg-muted/40 p-3 font-mono text-[11px] leading-relaxed text-destructive">
                 {JSON.stringify(row.wts_errors, null, 2)}
               </pre>
-            </Field>
+            </Card>
           )}
 
           <a
             href={`https://app.aioscrm.com/redirect?type=SESSION&id=${row.session_id}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline"
           >
-            Ver no WTS <ExternalLink className="h-3 w-3" />
+            Abrir conversa no Aios <ExternalLink className="h-3 w-3" />
           </a>
         </div>
 
@@ -197,23 +216,31 @@ export function SuggestionDrawer({ row, open, onOpenChange, readOnly }: Props) {
   );
 }
 
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+/* AIOS-style card: white, 12px radius, 0.5px border, 20-22px padding. */
+function Card({ children }: { children: React.ReactNode }) {
   return (
-    <section className="space-y-2">
-      <div className="flex items-baseline justify-between">
-        <h3 className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</h3>
-        {hint && <span className="font-mono text-[10px] text-muted-foreground">{hint}</span>}
-      </div>
+    <section className="rounded-xl border border-border bg-surface px-[22px] py-5 shadow-card">
       {children}
     </section>
+  );
+}
+
+function SectionLabel({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <h3
+      className={cn(
+        'mb-2.5 text-[11px] font-medium uppercase tracking-[0.05em] text-subtle-foreground',
+        className,
+      )}
+    >
+      {children}
+    </h3>
   );
 }
 
@@ -227,15 +254,15 @@ function Labeled({
   children: React.ReactNode;
 }) {
   return (
-    <label className="space-y-1.5 text-xs">
-      <div className="flex items-baseline gap-2">
-        <span className="text-muted-foreground">{label}</span>
+    <label className="flex flex-col gap-1.5">
+      <span className="flex items-baseline gap-2 text-[12px] text-muted-foreground">
+        {label}
         {override && (
-          <span className="rounded-sm bg-primary/15 px-1.5 py-0.5 font-mono text-[9px] text-primary">
+          <span className="rounded-full bg-primary-soft px-1.5 py-0.5 font-mono text-[9px] text-primary-soft-foreground">
             editado
           </span>
         )}
-      </div>
+      </span>
       {children}
     </label>
   );

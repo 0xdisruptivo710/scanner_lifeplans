@@ -6,7 +6,14 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from './empty-state';
 import { buildColumns } from './columns';
@@ -57,9 +64,9 @@ export function SuggestionsTable({
 
   if (loading) {
     return (
-      <div className="space-y-2 p-1">
+      <div className="space-y-1.5 p-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <Skeleton key={i} className="h-10 w-full" />
+          <Skeleton key={i} className="h-11 w-full rounded-md" />
         ))}
       </div>
     );
@@ -70,41 +77,43 @@ export function SuggestionsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id} className="hover:bg-transparent">
-              {hg.headers.map((h) => (
-                <TableHead key={h.id} style={{ width: h.column.columnDef.size }}>
-                  {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
-                </TableHead>
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((hg) => (
+          <TableRow key={hg.id} className="hover:bg-transparent">
+            {hg.headers.map((h) => (
+              <TableHead key={h.id} style={{ width: h.column.columnDef.size }}>
+                {h.isPlaceholder
+                  ? null
+                  : flexRender(h.column.columnDef.header, h.getContext())}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map((r) => {
+          const id = r.original.id;
+          const isSelected = selected.has(id);
+          return (
+            <TableRow
+              key={r.id}
+              data-state={isSelected ? 'selected' : undefined}
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest('[data-no-row-click]')) return;
+                onRowClick(r.original);
+              }}
+              className="cursor-pointer"
+            >
+              {r.getVisibleCells().map((c) => (
+                <TableCell key={c.id}>
+                  {flexRender(c.column.columnDef.cell, c.getContext())}
+                </TableCell>
               ))}
             </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((r) => {
-            const id = r.original.id;
-            const isSelected = selected.has(id);
-            return (
-              <TableRow
-                key={r.id}
-                data-state={isSelected ? 'selected' : undefined}
-                onClick={(e) => {
-                  if ((e.target as HTMLElement).closest('[data-no-row-click]')) return;
-                  onRowClick(r.original);
-                }}
-                className="cursor-pointer"
-              >
-                {r.getVisibleCells().map((c) => (
-                  <TableCell key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</TableCell>
-                ))}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

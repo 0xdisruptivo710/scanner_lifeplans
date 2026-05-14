@@ -38,7 +38,7 @@ export function ColumnSelect({
       <SelectContent className="max-h-[320px]">
         {grouped.map((g) => (
           <div key={g.panel} className="px-2 py-1">
-            <div className="px-1 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <div className="px-1 pb-1 text-[10px] font-medium uppercase tracking-[0.05em] text-subtle-foreground">
               {g.panel}
             </div>
             {g.steps.map((s) => (

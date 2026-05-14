@@ -97,19 +97,26 @@ function InboxPage() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-baseline justify-between">
-        <div>
-          <h2 className="text-lg font-medium tracking-tight">Caixa de sugestões</h2>
-          <p className="text-xs text-muted-foreground">
+    <div className="space-y-6">
+      {/* Page header — AIOS hierarchy: 22px/500 title, 14px secondary description */}
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-1">
+          <h1 className="text-[22px] font-medium leading-tight tracking-[-0.015em] text-foreground">
+            Caixa de Sugestões
+          </h1>
+          <p className="text-[14px] text-muted-foreground">
             Revisar, editar e aprovar follow-ups gerados pela IA.
           </p>
         </div>
-        <span className="font-mono text-xs text-muted-foreground">
-          {filtered.length} de {rows.length} visíveis
-        </span>
-      </div>
+        <div className="flex items-baseline gap-1.5 text-[12.5px] text-muted-foreground">
+          <span className="font-mono text-foreground">{filtered.length}</span>
+          <span>de</span>
+          <span className="font-mono">{rows.length}</span>
+          <span>visíveis</span>
+        </div>
+      </header>
 
+      {/* Filter chips + confidence */}
       <FilterTabs
         filter={filter}
         onFilterChange={setFilter}
@@ -118,15 +125,18 @@ function InboxPage() {
         onConfidenceChange={setConfidence}
       />
 
-      <SuggestionsTable
-        rows={filtered}
-        loading={suggestions.isLoading}
-        selected={selected}
-        onSelectChange={setSelected}
-        onRowClick={(r) => setOpenRow(r)}
-        onQuickApprove={handleQuickApprove}
-        onQuickReject={handleQuickReject}
-      />
+      {/* Data card — AIOS surface: white, 12px radius, 1px border */}
+      <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-card">
+        <SuggestionsTable
+          rows={filtered}
+          loading={suggestions.isLoading}
+          selected={selected}
+          onSelectChange={setSelected}
+          onRowClick={(r) => setOpenRow(r)}
+          onQuickApprove={handleQuickApprove}
+          onQuickReject={handleQuickReject}
+        />
+      </section>
 
       <BulkActionBar
         selectedCount={selectedRows.length}

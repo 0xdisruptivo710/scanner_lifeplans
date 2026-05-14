@@ -2,33 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * AIOS Inteligence — design tokens aligned with the real Aios CRM design system.
+ * RGB triplets so Tailwind's `bg-foo/30` alpha-modifier pipeline keeps working.
+ */
 @layer base {
   :root {
-    --background: 0.13 0 0;
-    --foreground: 0.97 0 0;
-    --muted: 0.20 0 0;
-    --muted-foreground: 0.65 0 0;
-    --card: 0.16 0 0;
-    --card-foreground: 0.97 0 0;
-    --border: 0.24 0 0;
-    --input: 0.20 0 0;
-    --primary: 0.85 0.18 95;
-    --primary-foreground: 0.18 0 0;
-    --destructive: 0.60 0.20 25;
-    --destructive-foreground: 0.97 0 0;
-    --accent: 0.22 0 0;
-    --accent-foreground: 0.97 0 0;
-    --ring: 0.55 0.10 95;
-    --radius: 0.5rem;
+    --background: 245 246 250;       /* #F5F6FA  page bg */
+    --surface: 255 255 255;          /* #FFFFFF  card surface */
+    --foreground: 17 24 39;          /* #111827  text primary */
+    --muted: 243 244 246;            /* #F3F4F6  hover / selected */
+    --muted-foreground: 107 114 128; /* #6B7280  text secondary */
+    --subtle-foreground: 156 163 175;/* #9CA3AF  text tertiary */
+    --border: 229 231 235;           /* #E5E7EB  hairline */
+    --border-strong: 209 213 219;    /* #D1D5DB  hairline emphasis */
+    --input: 229 231 235;
+    --card: 255 255 255;
+    --card-foreground: 17 24 39;
+
+    --primary: 79 70 229;            /* #4F46E5  CTA purple */
+    --primary-foreground: 255 255 255;
+    --primary-soft: 238 237 254;     /* #EEEDFE  soft purple bg */
+    --primary-soft-foreground: 79 70 229;
+    --accent: 91 77 231;             /* #5B4DE7  brand purple */
+    --accent-foreground: 255 255 255;
+
+    --success: 37 211 102;           /* #25D366  WhatsApp green */
+    --success-foreground: 255 255 255;
+    --success-soft: 220 252 231;
+    --info: 59 130 246;              /* #3B82F6 */
+    --info-foreground: 255 255 255;
+    --info-soft: 219 234 254;
+    --destructive: 239 68 68;        /* #EF4444 */
+    --destructive-foreground: 255 255 255;
+    --destructive-soft: 254 226 226;
+    --warning: 234 179 8;            /* #EAB308 */
+    --warning-soft: 254 249 195;
+
+    --ring: 79 70 229;
+    --radius: 0.75rem;               /* 12px — card */
   }
 
   * {
     @apply border-border;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv11', 'ss01', 'rlig' 1, 'calt' 1;
+  }
+
+  body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tabular numerals for mono — keeps numbers column-aligned. */
+  .font-mono,
+  pre,
+  code,
+  kbd {
+    font-variant-numeric: tabular-nums;
   }
 
   ::-webkit-scrollbar {
@@ -36,19 +72,35 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: oklch(var(--background));
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: oklch(var(--border));
-    border-radius: 4px;
+    background: rgb(var(--border-strong) / 0.7);
+    border: 2px solid rgb(var(--background));
+    border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: oklch(var(--muted-foreground) / 0.4);
+    background: rgb(var(--muted-foreground) / 0.5);
+  }
+
+  /* Hide native search/clear icons that clash with AIOS chrome. */
+  input[type='search']::-webkit-search-cancel-button {
+    display: none;
   }
 }
 
 @layer utilities {
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* AIOS section label: 13px, weight 500, uppercase, 0.05em tracking, tertiary color. */
+  .label-section {
+    @apply text-[13px] font-medium uppercase tracking-[0.05em] text-subtle-foreground;
+  }
+
+  /* AIOS bleed-divider — hairline that extends to card edge despite inner padding. */
+  .bleed-divider {
+    @apply -mx-[22px] h-px bg-border;
   }
 }

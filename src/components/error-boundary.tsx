@@ -18,7 +18,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
       return (
         <div className="min-h-screen bg-background text-foreground p-8 font-mono text-sm">
           <h1 className="mb-3 text-base font-medium">AIOS Inteligence — erro de runtime</h1>
-          <pre className="overflow-auto rounded-md border border-border bg-card p-4 text-rose-300">
+          <pre className="overflow-auto rounded-md border border-border bg-destructive-soft p-4 text-destructive">
             {this.state.error.name}: {this.state.error.message}
             {'\n\n'}
             {this.state.error.stack}

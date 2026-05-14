@@ -34,21 +34,26 @@ function HistoricoPage() {
   const rows = history.data ?? [];
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-baseline justify-between">
-        <div>
-          <h2 className="text-lg font-medium tracking-tight">Ações Aprovadas</h2>
-          <p className="text-xs text-muted-foreground">
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-1">
+          <h1 className="text-[22px] font-medium leading-tight tracking-[-0.015em] text-foreground">
+            Ações Aprovadas
+          </h1>
+          <p className="text-[14px] text-muted-foreground">
             Follow-ups aprovados e executados com sucesso.
           </p>
         </div>
-        <span className="font-mono text-xs text-muted-foreground">{rows.length} registros</span>
-      </div>
+        <div className="flex items-baseline gap-1.5 text-[12.5px] text-muted-foreground">
+          <span className="font-mono text-foreground">{rows.length}</span>
+          <span>registros</span>
+        </div>
+      </header>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-end gap-4">
         <FilterField label="Período">
           <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="h-9 w-[180px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -63,7 +68,7 @@ function HistoricoPage() {
 
         <FilterField label="Operador">
           <Select value={actionedBy} onValueChange={setActionedBy}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="h-9 w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -75,16 +80,18 @@ function HistoricoPage() {
         </FilterField>
       </div>
 
-      <SuggestionsTable
-        rows={rows}
-        loading={history.isLoading}
-        selected={new Set()}
-        onSelectChange={() => {}}
-        onRowClick={(r) => setOpenRow(r)}
-        onQuickApprove={() => {}}
-        onQuickReject={() => {}}
-        readOnly
-      />
+      <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-card">
+        <SuggestionsTable
+          rows={rows}
+          loading={history.isLoading}
+          selected={new Set()}
+          onSelectChange={() => {}}
+          onRowClick={(r) => setOpenRow(r)}
+          onQuickApprove={() => {}}
+          onQuickReject={() => {}}
+          readOnly
+        />
+      </section>
 
       <SuggestionDrawer
         row={openRow}
@@ -98,8 +105,8 @@ function HistoricoPage() {
 
 function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="space-y-1.5 text-xs">
-      <span className="block text-muted-foreground">{label}</span>
+    <label className="flex flex-col gap-1.5">
+      <span className="label-section text-[11px]">{label}</span>
       {children}
     </label>
   );

@@ -45,13 +45,14 @@ export const SCENARIO_LABELS: Record<ScenarioKey, string> = {
   tag_only_generic: 'Genérico',
 };
 
+// AIOS soft palette — paired with the Badge primary/neutral/success/info/danger/warning variants.
 export const SCENARIO_COLORS: Record<ScenarioKey, string> = {
-  orcamento_sem_resposta:     'border-yellow-500/30 bg-yellow-500/10 text-yellow-200',
-  pergunta_sem_resposta:      'border-orange-500/30 bg-orange-500/10 text-orange-200',
-  agendamento_incompleto:     'border-blue-500/30 bg-blue-500/10 text-blue-200',
-  interesse_silencio:         'border-purple-500/30 bg-purple-500/10 text-purple-200',
-  tag_only_no_engagement:     'border-zinc-500/30 bg-zinc-500/10 text-zinc-300',
-  tag_only_atendimento_ativo: 'border-green-500/30 bg-green-500/10 text-green-200',
-  tag_only_negocio_fechado:   'border-emerald-500/30 bg-emerald-500/10 text-emerald-200',
-  tag_only_generic:           'border-zinc-500/30 bg-zinc-500/10 text-zinc-300',
+  orcamento_sem_resposta:     'bg-warning-soft text-[#92400E]',
+  pergunta_sem_resposta:      'bg-[#FFEDD5] text-[#9A3412]',
+  agendamento_incompleto:     'bg-info-soft text-info/90',
+  interesse_silencio:         'bg-primary-soft text-primary-soft-foreground',
+  tag_only_no_engagement:     'bg-muted text-muted-foreground',
+  tag_only_atendimento_ativo: 'bg-success-soft text-success/90',
+  tag_only_negocio_fechado:   'bg-success-soft text-success',
+  tag_only_generic:           'bg-muted text-muted-foreground',
 };

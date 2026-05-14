@@ -18,11 +18,7 @@ export function EnvCheckGate({ children }: { children: React.ReactNode }) {
       <ul className="space-y-1">
         {missing.map((v) => (
           <li key={v.name} className="flex items-center gap-2">
-            <span
-              className={
-                v.ok ? 'text-emerald-300' : 'text-rose-300'
-              }
-            >
+            <span className={v.ok ? 'text-success' : 'text-destructive'}>
               {v.ok ? '✓' : '✗'}
             </span>
             <code>{v.name}</code>
