@@ -4,7 +4,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { TypeBadge } from './type-badge';
 import { ScenarioBadge } from './scenario-badge';
-import { ConfidenceBadge } from './confidence-badge';
 import { anonymizePhone, formatRelativeTime, truncate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { ActionStatus, SuggestionRow } from '@/lib/types';
@@ -102,24 +101,17 @@ export function buildColumns({
     },
     {
       id: 'preview',
-      size: 340,
+      size: 380,
       header: 'Resumo IA',
       cell: ({ row }) => (
         <span className="text-[12.5px] text-muted-foreground">
-          {truncate(row.original.message_sent ?? row.original.reasoning_short, 90)}
+          {truncate(row.original.message_sent ?? row.original.reasoning_short, 100)}
         </span>
       ),
     },
     {
-      id: 'confidence',
-      size: 90,
-      header: 'Conf.',
-      accessorFn: (r) => r.confidence ?? 0,
-      cell: ({ row }) => <ConfidenceBadge value={row.original.confidence} />,
-    },
-    {
       id: 'classified_at',
-      size: 90,
+      size: 100,
       header: 'Há',
       accessorFn: (r) => r.classified_at,
       cell: ({ row }) => (

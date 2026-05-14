@@ -24,35 +24,34 @@ function InboxPage() {
   const approve = useApprove();
 
   const [filter, setFilter] = useState<FilterKey>('all');
-  const [confidence, setConfidence] = useState(0.75);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [openRow, setOpenRow] = useState<SuggestionRow | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const rows = suggestions.data ?? [];
 
-  const counts = useMemo(() => {
-    const base = rows.filter((r) => (r.confidence ?? 0) >= confidence);
-    return {
-      all: base.length,
-      msg: base.filter((r) => r.suggest_message).length,
-      tag: base.filter((r) => !r.suggest_message).length,
-      cold: base.filter(
+  const counts = useMemo(
+    () => ({
+      all: rows.length,
+      msg: rows.filter((r) => r.suggest_message).length,
+      tag: rows.filter((r) => !r.suggest_message).length,
+      cold: rows.filter(
         (r) => r.scenario === 'tag_only_no_engagement' || r.tag_applied === 'NÃO RESPONDE',
       ).length,
-    };
-  }, [rows, confidence]);
+    }),
+    [rows],
+  );
 
   const filtered = useMemo(() => {
-    let r = rows.filter((row) => (row.confidence ?? 0) >= confidence);
-    if (filter === 'msg') r = r.filter((row) => row.suggest_message);
-    else if (filter === 'tag') r = r.filter((row) => !row.suggest_message);
-    else if (filter === 'cold')
-      r = r.filter(
-        (row) => row.scenario === 'tag_only_no_engagement' || row.tag_applied === 'NÃO RESPONDE',
+    if (filter === 'msg') return rows.filter((row) => row.suggest_message);
+    if (filter === 'tag') return rows.filter((row) => !row.suggest_message);
+    if (filter === 'cold')
+      return rows.filter(
+        (row) =>
+          row.scenario === 'tag_only_no_engagement' || row.tag_applied === 'NÃO RESPONDE',
       );
-    return r;
-  }, [rows, filter, confidence]);
+    return rows;
+  }, [rows, filter]);
 
   const selectedRows = useMemo(
     () => filtered.filter((r) => selected.has(r.id)),
@@ -99,17 +98,11 @@ function InboxPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page header — AIOS hierarchy: 22px/500 title, 14px secondary description */}
       <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <h1 className="text-[22px] font-medium leading-tight tracking-[-0.015em] text-foreground">
-              Caixa de Sugestões
-            </h1>
-            <p className="text-[14px] text-muted-foreground">
-              Revisar, editar e aprovar follow-ups gerados pela IA.
-            </p>
-          </div>
+        <div className="space-y-3">
+          <h1 className="text-[22px] font-medium leading-tight tracking-[-0.015em] text-foreground">
+            Caixa de Sugestões
+          </h1>
           <ScheduleNotice />
         </div>
         <div className="flex items-baseline gap-1.5 text-[12.5px] text-muted-foreground">
@@ -120,16 +113,8 @@ function InboxPage() {
         </div>
       </header>
 
-      {/* Filter chips + confidence */}
-      <FilterTabs
-        filter={filter}
-        onFilterChange={setFilter}
-        counts={counts}
-        confidence={confidence}
-        onConfidenceChange={setConfidence}
-      />
+      <FilterTabs filter={filter} onFilterChange={setFilter} counts={counts} />
 
-      {/* Data card — AIOS surface: white, 12px radius, 1px border */}
       <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-card">
         <SuggestionsTable
           rows={filtered}

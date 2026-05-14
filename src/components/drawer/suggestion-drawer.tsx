@@ -10,7 +10,6 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { ScenarioBadge } from '@/components/table/scenario-badge';
-import { ConfidenceBadge } from '@/components/table/confidence-badge';
 import { TypeBadge } from '@/components/table/type-badge';
 import { TagSelect } from './tag-select';
 import { ColumnSelect } from './column-select';
@@ -104,9 +103,6 @@ export function SuggestionDrawer({ row, open, onOpenChange, readOnly }: Props) {
           <div className="flex items-center gap-2">
             <TypeBadge suggestMessage={row.suggest_message} />
             <ScenarioBadge scenario={row.scenario} />
-            <span className="ml-auto">
-              <ConfidenceBadge value={row.confidence} />
-            </span>
           </div>
           <SheetTitle>{row.customer_name ?? 'Cliente sem nome'}</SheetTitle>
           <SheetDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
