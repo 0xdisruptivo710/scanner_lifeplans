@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { WTS_RATE_LIMIT_MS, BULK_CONCURRENCY } from '@/lib/constants';
+import { WTS_RATE_LIMIT_MS, BULK_CONCURRENCY, TABLE_AUTO_FOLLOWUP_LOG } from '@/lib/constants';
 import { sleep } from '@/lib/utils';
 import {
   wtsApplyTagById,
@@ -221,7 +221,7 @@ export async function approveOne({
   updates.wts_errors = errors;
 
   const { error: updErr } = await supabase
-    .from('wts_auto_followup_log')
+    .from(TABLE_AUTO_FOLLOWUP_LOG)
     .update(updates)
     .eq('id', row.id);
   if (updErr) {

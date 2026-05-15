@@ -22,8 +22,12 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const WHATSAPP_FROM_BY_CLIENT: Record<string, string> = {
-  itupeva: "5511913352918",
+  macae: "5522988291037",
 };
+
+// Tabelas com sufixo do cliente — esta Edge Function é deploy Macaé.
+const TABLE_AUTO_FOLLOWUP_LOG = "wts_auto_followup_log_macae";
+const TABLE_PANEL_MAPPING = "wts_panel_mapping_macae";
 
 const WTS_BASE = "https://api.wts.chat";
 
@@ -136,7 +140,7 @@ serve(async (req) => {
 
   // Load log row
   const { data: logRow, error: logErr } = await sb
-    .from("wts_auto_followup_log")
+    .from(TABLE_AUTO_FOLLOWUP_LOG)
     .select("id, client_handle, session_id, customer_phone, tag_applied, column_applied, message_sent, suggest_message, action_status")
     .eq("id", body.log_id)
     .single();
@@ -157,7 +161,7 @@ serve(async (req) => {
   // Archive shortcut — no WTS calls
   if (actionType === "archive") {
     const { error: updErr } = await sb
-      .from("wts_auto_followup_log")
+      .from(TABLE_AUTO_FOLLOWUP_LOG)
       .update({
         action_status: "rejected",
         actioned_by: body.actioned_by,
@@ -188,7 +192,7 @@ serve(async (req) => {
 
   if (log.column_applied) {
     const { data: mapRow } = await sb
-      .from("wts_panel_mapping")
+      .from(TABLE_PANEL_MAPPING)
       .select("panel_id, step_id")
       .eq("client_handle", log.client_handle)
       .eq("composite_key", log.column_applied)
@@ -333,7 +337,7 @@ serve(async (req) => {
   updates.wts_errors = errors;
 
   const { error: updErr } = await sb
-    .from("wts_auto_followup_log")
+    .from(TABLE_AUTO_FOLLOWUP_LOG)
     .update(updates)
     .eq("id", log.id);
 

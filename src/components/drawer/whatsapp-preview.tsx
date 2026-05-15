@@ -22,7 +22,7 @@ export function WhatsappPreview({ text }: { text: string }) {
           style={{ background: '#25D366' }}
           aria-hidden
         />
-        Forma de Ser · Itupeva
+        Face Doctor · Macaé
       </div>
 
       <div className="flex justify-end">

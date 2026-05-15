@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { CLIENT_HANDLE } from '@/lib/constants';
+import { CLIENT_HANDLE, TABLE_AUTO_FOLLOWUP_LOG } from '@/lib/constants';
 import type { SuggestionRow } from '@/lib/types';
 
 export function useSuggestions(opts?: { pollMs?: number | false }) {
@@ -8,7 +8,7 @@ export function useSuggestions(opts?: { pollMs?: number | false }) {
     queryKey: ['suggestions'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('wts_auto_followup_log')
+        .from(TABLE_AUTO_FOLLOWUP_LOG)
         .select('*')
         .eq('client_handle', CLIENT_HANDLE)
         .eq('action_status', 'pending')

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { CLIENT_HANDLE } from '@/lib/constants';
+import { CLIENT_HANDLE, TABLE_AUTO_FOLLOWUP_LOG } from '@/lib/constants';
 import type { RealtimeStatus } from '@/lib/types';
 
 export function useRealtime() {
@@ -17,7 +17,7 @@ export function useRealtime() {
         {
           event: '*',
           schema: 'public',
-          table: 'wts_auto_followup_log',
+          table: TABLE_AUTO_FOLLOWUP_LOG,
           filter: `client_handle=eq.${CLIENT_HANDLE}`,
         },
         () => {

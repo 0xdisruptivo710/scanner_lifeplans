@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { CLIENT_HANDLE } from '@/lib/constants';
+import { CLIENT_HANDLE, TABLE_AUTO_FOLLOWUP_LOG } from '@/lib/constants';
 import type { ActionStatus, SuggestionRow } from '@/lib/types';
 
 export type HistoryFilters = {
@@ -17,7 +17,7 @@ export function useHistory(filters: HistoryFilters = {}) {
     queryKey: ['history', filters],
     queryFn: async () => {
       let q = supabase
-        .from('wts_auto_followup_log')
+        .from(TABLE_AUTO_FOLLOWUP_LOG)
         .select('*')
         .eq('client_handle', CLIENT_HANDLE)
         .in('action_status', filters.status && filters.status !== 'all' ? [filters.status] : HISTORY_STATUSES)

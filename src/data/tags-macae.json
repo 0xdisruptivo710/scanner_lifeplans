@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-14",
+  "source": "CATALOGO_TAGS embutido no workflow n8n macae_followup_classifier (79 tags). Mantém todos os duplicados/variações de casing como aparecem na WTS — o classifier escolhe a forma exata.",
+  "client_handle": "macae",
+  "categories": {
+    "estado_crm": {
+      "label": "Estado da negociação / CRM",
+      "description": "Como o lead está no funil. São as tags mais usadas pelo classifier IA.",
+      "tags": [
+        "ACOMPANHAR",
+        "AGENDADO",
+        "Atenção Especial",
+        "ATENÇÃO RESPONDER",
+        "Avaliação",
+        "ENTRAR EM CONTATO MAIO",
+        "IA AGENDOU",
+        "Oportunidade",
+        "orçamento",
+        "Pendente",
+        "pendência de etiqueta",
+        "RASTREADO",
+        "RESGATE EFETIVADO",
+        "RETORNO",
+        "Retorno disparo",
+        "Sem resposta após tentativas",
+        "Venda",
+        "Venda perdida",
+        "VOLTAR COM A PACIENTE",
+        "Voltar p agendar",
+        "Voltar pra agendar"
+      ]
+    },
+    "campanha": {
+      "label": "Campanha / promoção",
+      "description": "Campanhas ativas, eventos e marcadores de oferta.",
+      "tags": [
+        "CAMPANHA",
+        "Campanha de cortesia",
+        "Comprou Black Friday",
+        "Grupo Vip",
+        "POWER - EVENTO",
+        "Power Musculo BCAA"
+      ]
+    },
+    "segmento": {
+      "label": "Segmento / marca",
+      "description": "Sub-marcas ou segmentos especiais. Preserva ambas formas (Adara/ADARA) porque aparecem assim na WTS.",
+      "tags": [
+        "Adara",
+        "ADARA"
+      ]
+    },
+    "origem_fonte": {
+      "label": "Origem / fonte do lead",
+      "description": "De onde o lead veio.",
+      "tags": [
+        "indicação"
+      ]
+    },
+    "operacional": {
+      "label": "Operacional / administrativo",
+      "description": "Marcadores não relacionados a procedimentos — fluxos internos da clínica.",
+      "tags": [
+        "currículo",
+        "Código de barra",
+        "intercorencia",
+        "VAGA BIOMEDICINA",
+        "VAGA BIOMÉDICA"
+      ]
+    },
+    "procedimento_facial": {
+      "label": "Procedimentos faciais",
+      "description": "Procedimentos estéticos faciais (botox, preenchimentos, peelings, ultraformer face, etc.).",
+      "tags": [
+        "Bigode chines",
+        "Bioestimulador",
+        "Botox",
+        "clareamento",
+        "Emagrecimento Facial",
+        "Fios PDO",
+        "Glow & Lift Experience",
+        "Harmonização",
+        "Lavieen",
+        "Limpeza de Pele",
+        "Microagulhamento",
+        "PDRN",
+        "Pálpebras",
+        "peeling",
+        "peeling retinóico",
+        "preenchimento bigode chinês",
+        "Preenchimento de Mandíbula",
+        "Preenchimento Labial",
+        "Preenchimento malar",
+        "Preenchimento Marionete",
+        "preenchimento mento",
+        "preenchimento olheira",
+        "Preenchimento Olheira",
+        "Sculptra",
+        "SIGNATURE LIPS",
+        "SkinBooster",
+        "sorriso",
+        "Ultraformer Full Face",
+        "Ultraformer Papada"
+      ]
+    },
+    "procedimento_corporal": {
+      "label": "Procedimentos corporais",
+      "description": "Procedimentos corporais (glúteos, gordura localizada, vascular, drenagem, etc.).",
+      "tags": [
+        "Bioglúteos",
+        "Celulite",
+        "Depilação",
+        "drenagem",
+        "Estrias",
+        "Lipo Enzimática",
+        "Perfect Glúteos",
+        "Preenchimento Corporal",
+        "Preenchimento Gluteos",
+        "Rejuvenescimento Intimo",
+        "Ultraformer Abdômen",
+        "ultraformer corporal",
+        "Vasinhos"
+      ]
+    },
+    "procedimento_capilar": {
+      "label": "Procedimentos capilares",
+      "description": "Tratamentos para couro cabeludo / queda capilar.",
+      "tags": [
+        "Lavieen Capilar",
+        "Mesoterapia Capilar"
+      ]
+    }
+  },
+  "all_flat": [
+    "ACOMPANHAR", "Adara", "ADARA", "AGENDADO", "Atenção Especial",
+    "ATENÇÃO RESPONDER", "Avaliação", "Bigode chines", "Bioestimulador",
+    "Bioglúteos", "Botox", "CAMPANHA", "Campanha de cortesia", "Celulite",
+    "clareamento", "Comprou Black Friday", "currículo", "Código de barra",
+    "Depilação", "drenagem", "Emagrecimento Facial", "ENTRAR EM CONTATO MAIO",
+    "Estrias", "Fios PDO", "Glow & Lift Experience", "Grupo Vip",
+    "Harmonização", "IA AGENDOU", "indicação", "intercorencia", "Lavieen",
+    "Lavieen Capilar", "Limpeza de Pele", "Lipo Enzimática",
+    "Mesoterapia Capilar", "Microagulhamento", "Oportunidade", "orçamento",
+    "PDRN", "peeling", "peeling retinóico", "Pendente",
+    "pendência de etiqueta", "Perfect Glúteos", "POWER - EVENTO",
+    "Power Musculo BCAA", "preenchimento bigode chinês",
+    "Preenchimento Corporal", "Preenchimento de Mandíbula",
+    "Preenchimento Gluteos", "Preenchimento Labial", "Preenchimento malar",
+    "Preenchimento Marionete", "preenchimento mento", "preenchimento olheira",
+    "Preenchimento Olheira", "Pálpebras", "RASTREADO",
+    "Rejuvenescimento Intimo", "RESGATE EFETIVADO", "RETORNO",
+    "Retorno disparo", "Sculptra", "Sem resposta após tentativas",
+    "SIGNATURE LIPS", "SkinBooster", "sorriso", "Ultraformer Abdômen",
+    "ultraformer corporal", "Ultraformer Full Face", "Ultraformer Papada",
+    "VAGA BIOMEDICINA", "VAGA BIOMÉDICA", "Vasinhos", "Venda",
+    "Venda perdida", "VOLTAR COM A PACIENTE", "Voltar p agendar",
+    "Voltar pra agendar"
+  ],
+  "stats": {
+    "total_tags": 79,
+    "categories": 8
+  },
+  "notes": [
+    "O classifier IA (workflow n8n macae_followup_classifier) sempre retorna uma das strings deste catálogo no campo `tag`. Mudar qualquer string aqui exige sincronizar o catálogo embutido no workflow n8n.",
+    "Casing inconsistente (Adara/ADARA, CAMPANHA/Campanha de cortesia, etc.) é proposital — reflete o que existe na WTS hoje."
+  ]
+}

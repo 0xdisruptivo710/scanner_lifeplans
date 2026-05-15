@@ -16,15 +16,15 @@ POST /functions/v1/wts-action
        │
        ▼
 Edge Function
-  1. Lê log em wts_auto_followup_log (precisa action_status=pending)
+  1. Lê log em wts_auto_followup_log_macae (precisa action_status=pending)
   2. Lê WTS token de _secrets (por client_handle)
-  3. Resolve panel/step de wts_panel_mapping (por column_applied)
+  3. Resolve panel/step de wts_panel_mapping_macae (por column_applied)
   4. POST  /core/v1/contact/phonenumber/{phone}/tags    (aplica tag)
   5. GET   /core/v1/contact/phonenumber/{phone}          (resolve contact_id)
   6. GET   /crm/v1/panel/card?PanelId&ContactId          (resolve card_id)
   7. PUT   /crm/v2/panel/card/{card_id}                  (move card)
   8. POST  /chat/v1/message/send                          (envia mensagem)
-  9. UPDATE wts_auto_followup_log SET action_status, timestamps, wts_errors
+  9. UPDATE wts_auto_followup_log_macae SET action_status, timestamps, wts_errors
  10. Retorna { status, log_id, actions: {...} }
 ```
 
@@ -146,12 +146,12 @@ Provável: token WTS expirado ou _secrets desatualizado.
 ## Tabelas envolvidas
 
 ### Leitura
-- `wts_auto_followup_log` — registro do FU sugerido pela IA
+- `wts_auto_followup_log_macae` — registro do FU sugerido pela IA (Macaé)
 - `_secrets` — token WTS do cliente (key='tokenwts')
-- `wts_panel_mapping` — lookup `Painel > Etapa` → `(panel_id, step_id)`
+- `wts_panel_mapping_macae` — lookup `Painel > Etapa` → `(panel_id, step_id)` (Macaé)
 
 ### Escrita
-- `wts_auto_followup_log` — UPDATE com timestamps, action_status, wts_errors, actioned_by, human_message_override
+- `wts_auto_followup_log_macae` — UPDATE com timestamps, action_status, wts_errors, actioned_by, human_message_override
 
 ## Segurança
 
@@ -165,16 +165,18 @@ Provável: token WTS expirado ou _secrets desatualizado.
 Quando a clínica adicionar/renomear painéis ou steps no WTS:
 ```sql
 -- Refazer mapping pra um client/painel específico
-DELETE FROM wts_panel_mapping WHERE client_handle='itupeva' AND panel_id='<id>';
+DELETE FROM wts_panel_mapping_macae WHERE client_handle='macae' AND panel_id='<id>';
 -- Depois rodar um helper que faz GET /crm/v1/panel/{id}?IncludeDetails=Steps
 -- e popula. Por ora é manual; pode virar Routine.
 ```
 
 ### Adicionar suporte a novo cliente
+Esta Edge Function é **single-tenant Macaé** (este clone). Para outro cliente, o padrão é clonar o repo todo seguindo `guide_pdr.md` — não estender esta function. Se mesmo assim precisar:
 1. Adicionar entrada em `WHATSAPP_FROM_BY_CLIENT` no `index.ts`
-2. Garantir `_secrets` tem row com `(client_handle=<novo>, key='tokenwts', value='<token>')`
-3. Popular `wts_panel_mapping` com os painéis comerciais desse cliente
-4. Deploy:
+2. Trocar `TABLE_AUTO_FOLLOWUP_LOG` / `TABLE_PANEL_MAPPING` para os nomes do novo cliente
+3. Garantir `_secrets` tem row com `(client_handle=<novo>, key='tokenwts', value='<token>')`
+4. Popular `wts_panel_mapping_<novo>` com os painéis comerciais desse cliente
+5. Deploy:
    ```bash
    supabase functions deploy wts-action --project-ref ehlpmukjdknnyhkycncb
    ```

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { CLIENT_HANDLE } from '@/lib/constants';
+import { CLIENT_HANDLE, TABLE_PANEL_MAPPING } from '@/lib/constants';
 import type { PanelMappingRow } from '@/lib/types';
 
 export type PanelMappingMap = Map<string, PanelMappingRow>;
@@ -10,7 +10,7 @@ export function usePanelMapping() {
     queryKey: ['panel-mapping'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('wts_panel_mapping')
+        .from(TABLE_PANEL_MAPPING)
         .select('*')
         .eq('client_handle', CLIENT_HANDLE);
       if (error) throw error;

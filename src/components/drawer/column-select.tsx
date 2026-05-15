@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/select';
 import { usePanelMapping } from '@/hooks/use-panel-mapping';
 
-const ALLOWED_PANEL = 'Painel Comercial - Gestor CRM';
+const ALLOWED_PANEL = 'Painel Comercial';
 
 export function ColumnSelect({
   value,

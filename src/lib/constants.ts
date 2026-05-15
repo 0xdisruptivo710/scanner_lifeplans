@@ -5,11 +5,17 @@ export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() 
 // Todas as chamadas WTS passam por /api/wts/* (Vercel Function proxy) para evitar CORS
 // e manter o token server-side. Em dev local sem `vercel dev`, esse path não responde.
 export const WTS_BASE = '/api/wts';
-export const WTS_TOKEN = ''; // token vive no servidor (env WTS_TOKEN_ITUPEVA)
-export const WHATSAPP_FROM = '5511913352918';
-export const CLIENT_HANDLE = 'itupeva';
+export const WTS_TOKEN = ''; // token vive no servidor (env WTS_TOKEN_MACAE)
+export const WHATSAPP_FROM = '5522988291037';
+export const CLIENT_HANDLE = 'macae';
 
-export const DEFAULT_PANEL_ID = '82b8ab1a-6945-4e63-a098-a7cf85a831cd';
+export const DEFAULT_PANEL_ID = '7fe38e2c-e582-469b-8e3e-0d37c7c06660';
+
+// Macaé compartilha o projeto Supabase do Itupeva mas isola seus dados em
+// tabelas sufixadas. Mudar todos de uma vez se quiser apontar para outro tenant.
+export const TABLE_AUTO_FOLLOWUP_LOG = 'wts_auto_followup_log_macae';
+export const TABLE_PANEL_MAPPING = 'wts_panel_mapping_macae';
+export const TABLE_FOLLOWUP_RUNS = 'wts_auto_followup_runs_macae';
 
 export const WTS_RATE_LIMIT_MS = 700;
 export const BULK_CONCURRENCY = 5;
