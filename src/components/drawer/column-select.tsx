@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/select';
 import { usePanelMapping } from '@/hooks/use-panel-mapping';
 
-const ALLOWED_PANEL = 'Painel Comercial';
+const ALLOWED_PANEL = 'PipeLine Saúde [IA]';
 
 export function ColumnSelect({
   value,

@@ -12,3 +12,6 @@ dist
 # Local tooling
 .aiox-core/
 .claude/
+
+# Per-client secrets (tokens, keys) — never commit
+client_vars_*.md

@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "generated_at": "2026-05-27",
+  "source": "Catálogo de tags do tenant Life Plans na WTS (14 tags). Mantém os nomes exatos como aparecem na WTS — o classifier escolhe a forma exata.",
+  "client_handle": "life-plans",
+  "categories": {
+    "estado_negociacao": {
+      "label": "Estado da Negociação",
+      "description": "Como o lead está no funil.",
+      "tags": [
+        "Cotou",
+        "Não cotou",
+        "Aguardando Implantação"
+      ]
+    },
+    "tipo_cliente": {
+      "label": "Tipo de Cliente",
+      "description": "PME (empresa) ou PF/Adesão (pessoa física).",
+      "tags": [
+        "PME",
+        "PF / Adesão"
+      ]
+    },
+    "fonte": {
+      "label": "Fonte do Lead",
+      "description": "Origem do contato.",
+      "tags": [
+        "Trafego Pago",
+        "Prospecção Própria"
+      ]
+    },
+    "ciclo_vida": {
+      "label": "Ciclo de Vida",
+      "description": "Estágio do relacionamento com o cliente.",
+      "tags": [
+        "INICIAR",
+        "Pós-Venda",
+        "Recuperação"
+      ]
+    },
+    "atencao": {
+      "label": "Atenção",
+      "description": "Marcadores internos de priorização.",
+      "tags": [
+        "importante",
+        "cobrar retorno",
+        "Não Lidas",
+        "Leads Distantes"
+      ]
+    }
+  },
+  "all_flat": [
+    "Aguardando Implantação",
+    "cobrar retorno",
+    "Cotou",
+    "importante",
+    "INICIAR",
+    "Leads Distantes",
+    "Não cotou",
+    "Não Lidas",
+    "PF / Adesão",
+    "PME",
+    "Pós-Venda",
+    "Prospecção Própria",
+    "Recuperação",
+    "Trafego Pago"
+  ],
+  "stats": {
+    "total_tags": 14,
+    "categories": 5
+  },
+  "notes": [
+    "A tag 'Cotou' está cadastrada na WTS com espaços inicial e final (' Cotou '). O classifier IA trata isso com .toLowerCase().trim(). No frontend exibimos sem espaços.",
+    "Mudar qualquer string aqui exige sincronizar o catálogo embutido no workflow n8n lifeplans_followup_classifier."
+  ]
+}
