@@ -7,11 +7,13 @@ export function useSuggestions(opts?: { pollMs?: number | false }) {
   return useQuery<SuggestionRow[]>({
     queryKey: ['suggestions'],
     queryFn: async () => {
+      // "Em aberto" = ainda não actioned. O scanner Life Plans grava NULL (não
+      // 'pending'), então o inbox precisa aceitar ambos (ver client_vars §9.1).
       const { data, error } = await supabase
         .from(TABLE_AUTO_FOLLOWUP_LOG)
         .select('*')
         .eq('client_handle', CLIENT_HANDLE)
-        .eq('action_status', 'pending')
+        .or('action_status.is.null,action_status.eq.pending')
         .order('classified_at', { ascending: false })
         .limit(500);
       if (error) throw error;
