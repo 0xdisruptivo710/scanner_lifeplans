@@ -20,6 +20,25 @@ export const TABLE_FOLLOWUP_RUNS = 'wts_auto_followups_runs_life';
 export const WTS_RATE_LIMIT_MS = 700;
 export const BULK_CONCURRENCY = 5;
 
+// ── Responsável (atendente) ──────────────────────────────────────────────
+// O scanner grava responsible_user_id (uid WTS) em cada sugestão, mas nem sempre
+// resolve o nome (responsible_user_name fica nulo). Este mapa garante o nome de
+// exibição no filtro do inbox. Plugar novos atendentes aqui quando o uid aparecer.
+export const RESPONSIBLE_NAMES: Record<string, string> = {
+  'f6f4d635-d9ab-47e0-96fa-2c0a041770b9': 'Andre Luiz',
+  '7a2cf6ae-82b5-4bad-9cec-d0fd992d4318': 'Claudia Rodrigues',
+  'e22b9c9c-5806-463f-a5fe-10362282e4f8': 'Thays',
+  // '<uid-da-aliny>': 'Aliny',  // funcionária nova — adicionar quando o scanner capturar o uid
+};
+
+// uids que NUNCA entram no dropdown nem na visão "Todos" (gerência / bot / ex).
+export const HIDDEN_RESPONSIBLE_IDS = new Set<string>([
+  '26152132-b1d4-4318-b52f-e726188c5a3f', // Roberta Martins (saiu)
+  '10b6634a-c3dc-4083-af23-f36ff009b887', // Solange Silva (saiu)
+  '00000000-0000-0000-0000-000000000000', // bot / sistema
+  // '<uid-da-patricia>',                  // gerência (não atende) — confirmar uid
+]);
+
 export const MSG_MIN = 40;
 export const MSG_MAX = 600;
 export const BANNED_PHRASES = [

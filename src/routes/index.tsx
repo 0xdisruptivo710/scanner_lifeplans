@@ -4,6 +4,13 @@ import { Clock3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Route as rootRoute } from './__root';
 import { FilterTabs, type FilterKey } from '@/components/layout/filter-tabs';
+import { ResponsibleFilter } from '@/components/layout/responsible-filter';
+import {
+  RESP_ALL,
+  buildResponsibleOptions,
+  matchesResponsible,
+  type ResponsibleValue,
+} from '@/lib/responsibles';
 import { SuggestionsTable } from '@/components/table/suggestions-table';
 import { BulkActionBar } from '@/components/layout/bulk-action-bar';
 import { SuggestionDrawer } from '@/components/drawer/suggestion-drawer';
@@ -24,34 +31,44 @@ function InboxPage() {
   const approve = useApprove();
 
   const [filter, setFilter] = useState<FilterKey>('all');
+  const [responsible, setResponsible] = useState<ResponsibleValue>(RESP_ALL);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [openRow, setOpenRow] = useState<SuggestionRow | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const rows = suggestions.data ?? [];
 
+  // Opções do dropdown: derivadas de todas as linhas (estáveis vs. filtro de tipo).
+  const responsibleOptions = useMemo(() => buildResponsibleOptions(rows), [rows]);
+
+  // 1º recorte: por responsável. As abas de tipo operam dentro deste subconjunto.
+  const byResponsible = useMemo(
+    () => rows.filter((row) => matchesResponsible(row, responsible)),
+    [rows, responsible],
+  );
+
   const counts = useMemo(
     () => ({
-      all: rows.length,
-      msg: rows.filter((r) => r.suggest_message).length,
-      tag: rows.filter((r) => !r.suggest_message).length,
-      cold: rows.filter(
+      all: byResponsible.length,
+      msg: byResponsible.filter((r) => r.suggest_message).length,
+      tag: byResponsible.filter((r) => !r.suggest_message).length,
+      cold: byResponsible.filter(
         (r) => r.scenario === 'tag_only_no_engagement' || r.tag_applied === 'NÃO RESPONDE',
       ).length,
     }),
-    [rows],
+    [byResponsible],
   );
 
   const filtered = useMemo(() => {
-    if (filter === 'msg') return rows.filter((row) => row.suggest_message);
-    if (filter === 'tag') return rows.filter((row) => !row.suggest_message);
+    if (filter === 'msg') return byResponsible.filter((row) => row.suggest_message);
+    if (filter === 'tag') return byResponsible.filter((row) => !row.suggest_message);
     if (filter === 'cold')
-      return rows.filter(
+      return byResponsible.filter(
         (row) =>
           row.scenario === 'tag_only_no_engagement' || row.tag_applied === 'NÃO RESPONDE',
       );
-    return rows;
-  }, [rows, filter]);
+    return byResponsible;
+  }, [byResponsible, filter]);
 
   const selectedRows = useMemo(
     () => filtered.filter((r) => selected.has(r.id)),
@@ -113,7 +130,14 @@ function InboxPage() {
         </div>
       </header>
 
-      <FilterTabs filter={filter} onFilterChange={setFilter} counts={counts} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FilterTabs filter={filter} onFilterChange={setFilter} counts={counts} />
+        <ResponsibleFilter
+          value={responsible}
+          onChange={setResponsible}
+          options={responsibleOptions}
+        />
+      </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-card">
         <SuggestionsTable
