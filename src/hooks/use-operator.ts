@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
+import { OPERATORS, DEFAULT_OPERATOR } from '@/lib/constants';
 import type { Operator } from '@/lib/types';
 
 const KEY = 'aios.operator';
-const DEFAULT_OPERATOR: Operator = 'Murilo';
 
 function read(): Operator {
   if (typeof window === 'undefined') return DEFAULT_OPERATOR;
   const v = window.localStorage.getItem(KEY);
-  return v === 'Lucas' || v === 'Murilo' ? v : DEFAULT_OPERATOR;
+  return v && OPERATORS.includes(v) ? v : DEFAULT_OPERATOR;
 }
 
 export function useOperator() {

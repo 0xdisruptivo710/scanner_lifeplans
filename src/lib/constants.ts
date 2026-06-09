@@ -39,6 +39,11 @@ export const HIDDEN_RESPONSIBLE_IDS = new Set<string>([
   // '<uid-da-patricia>',                  // gerência (não atende) — confirmar uid
 ]);
 
+// Operadores que aprovam sugestões = roster de atendentes ativos (fonte única
+// acima). Usado no filtro "Operador" e como autor (actioned_by) na aprovação.
+export const OPERATORS: string[] = Object.values(RESPONSIBLE_NAMES);
+export const DEFAULT_OPERATOR = OPERATORS[0] ?? '';
+
 export const MSG_MIN = 40;
 export const MSG_MAX = 600;
 export const BANNED_PHRASES = [

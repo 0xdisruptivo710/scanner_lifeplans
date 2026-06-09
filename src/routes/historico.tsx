@@ -4,6 +4,7 @@ import { Route as rootRoute } from './__root';
 import { SuggestionsTable } from '@/components/table/suggestions-table';
 import { SuggestionDrawer } from '@/components/drawer/suggestion-drawer';
 import { useHistory } from '@/hooks/use-history';
+import { OPERATORS } from '@/lib/constants';
 import {
   Select,
   SelectContent,
@@ -68,13 +69,16 @@ function HistoricoPage() {
 
         <FilterField label="Operador">
           <Select value={actionedBy} onValueChange={setActionedBy}>
-            <SelectTrigger className="h-9 w-[140px]">
+            <SelectTrigger className="h-9 w-[190px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="Murilo">Murilo</SelectItem>
-              <SelectItem value="Lucas">Lucas</SelectItem>
+              {OPERATORS.map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </FilterField>

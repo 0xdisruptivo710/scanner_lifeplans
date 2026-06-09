@@ -81,6 +81,8 @@ export type WtsResult<T = unknown> =
   | { ok: true; data: T }
   | { ok: false; status: number; error: string };
 
-export type Operator = 'Murilo' | 'Lucas';
+// Nome do atendente que aprova (ver OPERATORS em constants.ts). Texto livre
+// porque é gravado em actioned_by e exibido como está.
+export type Operator = string;
 
 export type RealtimeStatus = 'CONNECTING' | 'SUBSCRIBED' | 'CLOSED' | 'CHANNEL_ERROR';

@@ -1,7 +1,7 @@
 import { RESPONSIBLE_NAMES, HIDDEN_RESPONSIBLE_IDS } from '@/lib/constants';
 import type { SuggestionRow } from '@/lib/types';
 
-// Valores especiais do filtro (além de um responsible_user_id).
+// Valores especiais do filtro (além de um responsible_user_id concreto).
 export const RESP_ALL = 'all';
 export const RESP_NONE = 'none';
 
@@ -14,17 +14,30 @@ export type ResponsibleOption = {
   count: number;
 };
 
+type RespRow = Pick<SuggestionRow, 'responsible_user_id' | 'responsible_user_name'>;
+
 /**
- * Nome de exibição do responsável de uma linha, por precedência:
- * mapa de uids → nome gravado pelo scanner → "Sem nome".
+ * Nome resolvido do responsável por precedência: mapa de uids → nome gravado
+ * pelo scanner. Retorna null quando não há nome em nenhuma das fontes.
  */
-export function resolveResponsibleName(
-  row: Pick<SuggestionRow, 'responsible_user_id' | 'responsible_user_name'>,
-): string {
+export function resolveResponsibleName(row: RespRow): string | null {
   const id = row.responsible_user_id;
   if (id && RESPONSIBLE_NAMES[id]) return RESPONSIBLE_NAMES[id];
   if (row.responsible_user_name) return row.responsible_user_name;
-  return 'Sem nome';
+  return null;
+}
+
+function isHidden(id: string | null): boolean {
+  return id !== null && HIDDEN_RESPONSIBLE_IDS.has(id);
+}
+
+/**
+ * Linha sem dono identificável: sem id, ou id (não-oculto) sem nome resolvível.
+ * Tudo isso é agrupado num único bucket "Sem responsável".
+ */
+function isUnassigned(row: SuggestionRow): boolean {
+  if (isHidden(row.responsible_user_id)) return false; // ocultos não contam aqui
+  return resolveResponsibleName(row) === null;
 }
 
 /**
@@ -32,16 +45,15 @@ export function resolveResponsibleName(
  * Em "Todos", esconde gerência/bot/ex (HIDDEN_RESPONSIBLE_IDS).
  */
 export function matchesResponsible(row: SuggestionRow, value: ResponsibleValue): boolean {
-  const id = row.responsible_user_id;
-  if (value === RESP_ALL) return id === null || !HIDDEN_RESPONSIBLE_IDS.has(id);
-  if (value === RESP_NONE) return id === null;
-  return id === value;
+  if (value === RESP_ALL) return !isHidden(row.responsible_user_id);
+  if (value === RESP_NONE) return isUnassigned(row);
+  return row.responsible_user_id === value;
 }
 
 /**
  * Monta as opções do dropdown a partir das linhas carregadas: "Todos" primeiro,
- * um item por atendente ativo (alfabético), e "Sem responsável" por último.
- * Responsáveis ocultos não viram item nem contam em "Todos".
+ * um item por atendente nomeado (alfabético), e um único "Sem responsável" por
+ * último agrupando tudo que não tem dono identificável. Ocultos não entram.
  */
 export function buildResponsibleOptions(rows: SuggestionRow[]): ResponsibleOption[] {
   const byId = new Map<string, { label: string; count: number }>();
@@ -49,19 +61,17 @@ export function buildResponsibleOptions(rows: SuggestionRow[]): ResponsibleOptio
   let visibleTotal = 0;
 
   for (const row of rows) {
-    const id = row.responsible_user_id;
-    if (id === null) {
-      noneCount += 1;
-      visibleTotal += 1;
-      continue;
-    }
-    if (HIDDEN_RESPONSIBLE_IDS.has(id)) continue;
+    if (isHidden(row.responsible_user_id)) continue;
     visibleTotal += 1;
-    const existing = byId.get(id);
-    if (existing) {
-      existing.count += 1;
+
+    const id = row.responsible_user_id;
+    const name = id === null ? null : resolveResponsibleName(row);
+    if (id !== null && name !== null) {
+      const existing = byId.get(id);
+      if (existing) existing.count += 1;
+      else byId.set(id, { label: name, count: 1 });
     } else {
-      byId.set(id, { label: resolveResponsibleName(row), count: 1 });
+      noneCount += 1;
     }
   }
 
