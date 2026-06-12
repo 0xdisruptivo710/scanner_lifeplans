@@ -129,7 +129,11 @@ export async function approveOne({
       const map = mapping?.get(row.column_applied);
       if (map) {
         targetPanelId = map.panel_id;
-        if (!targetStepId) targetStepId = map.step_id;
+        // O mapping é a fonte de verdade do destino (painel + etapa). O classificador
+        // ainda grava suggested_step_id com UUIDs do painel antigo/inativo, então ele só
+        // serve de fallback quando a coluna NÃO resolve no mapping. Caso contrário, um
+        // override de coluna pelo atendente seria ignorado e o card iria pra etapa errada.
+        targetStepId = map.step_id;
       }
     }
 

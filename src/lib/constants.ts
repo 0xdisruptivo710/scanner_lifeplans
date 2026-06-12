@@ -9,7 +9,11 @@ export const WTS_TOKEN = ''; // token vive no servidor (env WTS_TOKEN_LIFE_PLANS
 export const WHATSAPP_FROM = '551541412625';
 export const CLIENT_HANDLE = 'life-plans';
 
-export const DEFAULT_PANEL_ID = '56951001-83d3-4d29-8fcb-16f80c4cec12';
+// Painel ATIVO "Pipeline Comercial" (chave PC) — destino real de movimentações/criações
+// de card. O painel antigo "PipeLine Saúde [IA]" (56951001-…) foi DESATIVADO em jun/2026.
+// Obs.: no wts_panel_mapping o panel_name continua 'PipeLine Saúde [IA]' (alias que casa
+// com o column_applied gravado pelo N8N); só o panel_id/step_id apontam pro painel novo.
+export const DEFAULT_PANEL_ID = '1055f96d-fa55-49a8-82f9-29dee1948a2a';
 
 // Life Plans compartilha o projeto Supabase mas isola seus dados em tabelas
 // específicas. wts_panel_mapping é compartilhado (sem sufixo) e filtrado por client_handle.
